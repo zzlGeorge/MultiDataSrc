@@ -1,5 +1,8 @@
 package com.george.multidb;
 
+import com.george.dao.entities.DBDetails;
+import com.george.dao.entities.DBSrcInfo;
+import com.george.dao.mappers.DBDetailsMapper;
 import com.george.utils.jdbcUtils.JdbcUtil;
 
 import java.sql.Connection;
@@ -8,12 +11,14 @@ import java.util.*;
 /**
  * Created by George on 2017/8/9.
  */
-public class DBSrcInfoHelper implements IDBSrcInfoHelper{
+public class DBSrcInfoHelper implements IDBSrcInfoHelper {
 
     /**
      * 医院  -   数据源ID
      */
     public static Map<String, String> HOSPITAL_SRCID;
+
+    private DBDetailsMapper dbDetailsMapper = SqlSessionHelper.getMapperInstance(DBDetailsMapper.class, 0);
 
     static {
         SqlSessionHelper.createLocalPool();
@@ -21,6 +26,32 @@ public class DBSrcInfoHelper implements IDBSrcInfoHelper{
     }
 
     public Map<String, String> getDBSrcConnDetail(Integer srcId) {
+        Map<String, String> resultMap = new HashMap<String, String>();
+        List<DBDetails> data = dbDetailsMapper.getDBSrcConnInfo(null);
+        for (DBDetails dbDetails : data) {
+            DBSrcInfo targetInfo = findTargetDbSrcInfo(dbDetails.getDataBases(), srcId);
+            if (targetInfo != null) {
+                resultMap.put("driver", dbDetails.getDriverName());
+
+                String totalUrl = dbDetails.getUrl() + targetInfo.getSrcDbName();
+                resultMap.put("url", totalUrl);
+
+                resultMap.put("username", dbDetails.getUserName());
+                resultMap.put("password", dbDetails.getPassword());
+                return resultMap;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 找到目标数据库信息
+     */
+    private DBSrcInfo findTargetDbSrcInfo(List<DBSrcInfo> sets, Integer targetId) {
+        for (DBSrcInfo info : sets) {
+            if (info.getId() == targetId)
+                return info;
+        }
         return null;
     }
 

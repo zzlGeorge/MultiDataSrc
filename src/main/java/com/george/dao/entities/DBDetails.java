@@ -3,6 +3,7 @@ package com.george.dao.entities;
 import com.george.utils.generators.mybatis.generator.annotation.Table;
 
 import java.util.Date;
+import java.util.List;
 
 @Table(name = "db_details")
 public class DBDetails {
@@ -12,6 +13,7 @@ public class DBDetails {
     private String userName;
     private String password;
     private Date updateTime;
+    private List<DBSrcInfo> dataBases;//子表
 
     public Integer getId() {
         return id;
@@ -61,4 +63,11 @@ public class DBDetails {
         this.updateTime = updateTime;
     }
 
+    public List<DBSrcInfo> getDataBases() {
+        return dataBases;
+    }
+
+    public void setDataBases(List<DBSrcInfo> dataBases) {
+        this.dataBases = dataBases;
+    }
 }

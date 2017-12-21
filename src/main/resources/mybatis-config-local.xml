@@ -39,6 +39,7 @@
         </environment>
     </environments>
     <mappers>
-        <!--<mapper resource="mybatis/mapper/hospitalinfo/HospitalDbDao.xml"/>-->
+        <mapper resource="mappers/base/CRUDMapper.xml"/>
+        <mapper resource="mappers/DBDetailsMapper.xml"/>
     </mappers>
 </configuration>

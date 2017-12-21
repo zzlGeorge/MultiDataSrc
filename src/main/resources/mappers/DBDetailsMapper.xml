@@ -6,34 +6,74 @@
         id,  url , userName , driverName , updateTime , password 
     </sql>
 
-    <select id="get" parameterType="java.lang.Long" resultType="com.george.dao.entities.DBDetails" >
-        SELECT <include refid="baseColumns"/> FROM db_details WHERE id = #{id}
+    <resultMap id="dbSrcInfoMap" type="com.george.dao.entities.DBDetails">
+        <id property="id" column="id"/>
+        <result property="driverName" column="driverName"/>
+        <result property="url" column="url"/>
+        <result property="userName" column="userName"/>
+        <result property="password" column="password"/>
+        <result property="updateTime" column="updateTime"/>
+        <collection property="dataBases" ofType="com.george.dao.entities.DBSrcInfo">
+            <id property="id" column="id"/>
+            <result property="srcName" column="srcName"/>
+            <result property="srcDbName" column="srcDbName"/>
+            <result property="srcUrlId" column="srcUrlId"/>
+            <result property="status" column="status"/>
+            <result property="type" column="type"/>
+            <result property="updateTime" column="updateTime"/>
+        </collection>
+    </resultMap>
+
+    <select id="get" parameterType="java.lang.Long" resultType="com.george.dao.entities.DBDetails">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM db_details WHERE id = #{id}
     </select>
 
-    <select id="findByEntity" parameterType="com.george.dao.entities.DBDetails" resultType="com.george.dao.entities.DBDetails">
-        SELECT <include refid="baseColumns"/> FROM db_details
+    <select id="findByEntity" parameterType="com.george.dao.entities.DBDetails"
+            resultType="com.george.dao.entities.DBDetails">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM db_details
         <where>
-                <if test="entity.url != null">
-                     url = #{entity.url}
-                </if>
-                <if test="entity.userName != null">
-                     AND userName = #{entity.userName}
-                </if>
-                <if test="entity.driverName != null">
-                     AND driverName = #{entity.driverName}
-                </if>
-                <if test="entity.updateTime != null">
-                     AND updateTime = #{entity.updateTime}
-                </if>
-                <if test="entity.password != null">
-                     AND password = #{entity.password}
-                </if>
+            <if test="entity.url != null">
+                url = #{entity.url}
+            </if>
+            <if test="entity.userName != null">
+                AND userName = #{entity.userName}
+            </if>
+            <if test="entity.driverName != null">
+                AND driverName = #{entity.driverName}
+            </if>
+            <if test="entity.updateTime != null">
+                AND updateTime = #{entity.updateTime}
+            </if>
+            <if test="entity.password != null">
+                AND password = #{entity.password}
+            </if>
         </where>
         <include refid="com.george.utils.generators.mybatis.mapper.CRUDMapper.orderBy"/>
     </select>
 
+    <select id="getDBSrcConnInfo" parameterType="com.george.dao.entities.DBDetails" resultMap="dbSrcInfoMap">
+        SELECT
+            srcinf.id,
+            srcinf.srcName,
+            srcinf.srcDbName,
+            srcinf.srcUrlId,
+            srcinf.`status`,
+            srcinf.type,
+            srcinf.updateTime,
+            dt.*
+        FROM
+            db_details dt
+        LEFT JOIN db_src_info srcinf ON srcinf.srcUrlId = dt.id
+    </select>
+
     <select id="criteriaSearch" resultType="com.george.dao.entities.DBDetails">
-        SELECT <include refid="baseColumns"/> FROM db_details
+        SELECT
+        <include refid="baseColumns"/>
+        FROM db_details
         <where>
             <include refid="com.george.utils.generators.mybatis.mapper.CRUDMapper.conditions"/>
         </where>
@@ -42,7 +82,8 @@
 
     <insert id="save" parameterType="com.george.dao.entities.DBDetails" useGeneratedKeys="true" keyProperty="entity.id">
         INSERT INTO db_details(<include refid="baseColumns"/>) VALUE
-        (#{entity.id},  #{entity.url} ,  #{entity.userName} ,  #{entity.driverName} ,  #{entity.updateTime} ,  #{entity.password}  )
+        (#{entity.id}, #{entity.url} , #{entity.userName} , #{entity.driverName} , #{entity.updateTime} ,
+        #{entity.password} )
     </insert>
 
     <update id="update" parameterType="com.george.dao.entities.DBDetails">
@@ -61,7 +102,7 @@
                 updateTime = #{entity.updateTime} ,
             </if>
             <if test="entity.password != null">
-                password = #{entity.password} 
+                password = #{entity.password}
             </if>
         </set>
         WHERE id = #{entity.id}

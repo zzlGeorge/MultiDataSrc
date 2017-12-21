@@ -6,7 +6,7 @@ package com.george.utils;
 public class PageParam {
 
 
-    private int iDisplayStart = 1;
+    private int iDisplayStart = 0;
 
     private int iDisplayLength = 10;
 

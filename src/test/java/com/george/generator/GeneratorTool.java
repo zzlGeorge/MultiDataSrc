@@ -46,7 +46,7 @@ public class GeneratorTool {
         Connection connection = SqlSessionHelper.getPoolConn(0);//指定数据库连接
         try {
             boolean res = BeanProcess.generateJavaBeanFromDB(Constants.ROOT_PATH + "/src/main/java", "com.george.dao.entities",
-                    connection, "db_details", "DBDetails");//生成javabean文件于指定位置
+                    connection, "db_src_info", "DBSrcInfo");//生成javabean文件于指定位置
             connection.close();
         } catch (SQLException e) {
             e.printStackTrace();

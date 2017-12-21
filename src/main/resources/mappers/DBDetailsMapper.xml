@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.george.dao.mappers.DBDetailsMapper">
+
+    <sql id="baseColumns">
+        id,  url , userName , driverName , updateTime , password 
+    </sql>
+
+    <select id="get" parameterType="java.lang.Long" resultType="com.george.dao.entities.DBDetails" >
+        SELECT <include refid="baseColumns"/> FROM db_details WHERE id = #{id}
+    </select>
+
+    <select id="findByEntity" parameterType="com.george.dao.entities.DBDetails" resultType="com.george.dao.entities.DBDetails">
+        SELECT <include refid="baseColumns"/> FROM db_details
+        <where>
+                <if test="entity.url != null">
+                     url = #{entity.url}
+                </if>
+                <if test="entity.userName != null">
+                     AND userName = #{entity.userName}
+                </if>
+                <if test="entity.driverName != null">
+                     AND driverName = #{entity.driverName}
+                </if>
+                <if test="entity.updateTime != null">
+                     AND updateTime = #{entity.updateTime}
+                </if>
+                <if test="entity.password != null">
+                     AND password = #{entity.password}
+                </if>
+        </where>
+        <include refid="com.george.utils.generators.mybatis.mapper.CRUDMapper.orderBy"/>
+    </select>
+
+    <select id="criteriaSearch" resultType="com.george.dao.entities.DBDetails">
+        SELECT <include refid="baseColumns"/> FROM db_details
+        <where>
+            <include refid="com.george.utils.generators.mybatis.mapper.CRUDMapper.conditions"/>
+        </where>
+        <include refid="com.george.utils.generators.mybatis.mapper.CRUDMapper.orderBy"/>
+    </select>
+
+    <insert id="save" parameterType="com.george.dao.entities.DBDetails" useGeneratedKeys="true" keyProperty="entity.id">
+        INSERT INTO db_details(<include refid="baseColumns"/>) VALUE
+        (#{entity.id},  #{entity.url} ,  #{entity.userName} ,  #{entity.driverName} ,  #{entity.updateTime} ,  #{entity.password}  )
+    </insert>
+
+    <update id="update" parameterType="com.george.dao.entities.DBDetails">
+        UPDATE db_details
+        <set>
+            <if test="entity.url != null">
+                url = #{entity.url} ,
+            </if>
+            <if test="entity.userName != null">
+                userName = #{entity.userName} ,
+            </if>
+            <if test="entity.driverName != null">
+                driverName = #{entity.driverName} ,
+            </if>
+            <if test="entity.updateTime != null">
+                updateTime = #{entity.updateTime} ,
+            </if>
+            <if test="entity.password != null">
+                password = #{entity.password} 
+            </if>
+        </set>
+        WHERE id = #{entity.id}
+    </update>
+
+    <delete id="delete" parameterType="java.lang.Long">
+        DELETE FROM db_details WHERE id = #{id}
+    </delete>
+</mapper>

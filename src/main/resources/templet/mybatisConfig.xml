@@ -26,8 +26,9 @@
     <environments default="development">
         <environment id="development">
             <transactionManager type="jdbc"/>
-            <dataSource type="POOLED">
-                <property name="driver" value="#driver#"/>
+            <!--<dataSource type="POOLED">-->
+            <dataSource type="com.george.multidb.DruidDataSourceDefine">
+                <!--<property name="driver" value="#driver#"/>
                 <property name="url" value="#url#"/>
                 <property name="username" value="#username#"/>
                 <property name="password" value="#password#"/>
@@ -39,7 +40,15 @@
 
                 <property name="poolPingQuery" value="SELECT 1"/>
                 <property name="poolPingEnabled" value="true"/>
-                <property name="poolPingConnectionsNotUsedFor" value="5"/>
+                <property name="poolPingConnectionsNotUsedFor" value="5"/>-->
+
+                <property name="driver" value="#driver#"/>
+                <property name="url" value="#url#"/>
+                <property name="username" value="#username#"/>
+                <property name="password" value="#password#"/>
+                <!--<property name="initialSize" value="0" />-->
+                <property name="maxActive" value="20"/>
+                <property name="minIdle" value="0"/>
             </dataSource>
         </environment>
     </environments>

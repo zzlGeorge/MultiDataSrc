@@ -1,15 +1,13 @@
 package com.george;
 
+import com.alibaba.druid.pool.DruidDataSource;
 import com.george.dao.mappers.DBSrcMappersEntityMapper;
 import com.george.multidb.Impl.DBSrcInfoHelper;
 import com.george.multidb.SqlSessionHelper;
 import com.george.utils.jdbcUtils.JdbcDao;
 import org.junit.Test;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 /**
  * Created by George on 2017/12/12.
@@ -44,5 +42,52 @@ public class CommonTest {
         DBSrcMappersEntityMapper mapper = SqlSessionHelper.getMapperInstance(DBSrcMappersEntityMapper.class, 1);
         mapper.getSrcMappers(null);
         System.out.println();
+    }
+
+    /**
+     * Druid连接池测试
+     * */
+    @Test
+    public void testDruidPools() {
+        //创建了一个实例
+        DruidDataSource dataSource = new DruidDataSource();
+        //设置数据库连接地址
+        dataSource.setUrl("jdbc:mysql://localhost:3306/multi_db");
+        dataSource.setUsername("root");
+        dataSource.setPassword("123456");
+        //设置初始化大小
+        dataSource.setInitialSize(1);
+        //设置在数据库连接词中的最小连接数
+        dataSource.setMinIdle(1);
+        //设置最大连接数
+        dataSource.setMaxActive(20);
+        //设置获取连接的最大等待时间
+        dataSource.setMaxWait(60000);
+
+        dataSource.setTimeBetweenEvictionRunsMillis(60000);
+
+        dataSource.setMinEvictableIdleTimeMillis(300000);
+
+        dataSource.setValidationQuery("SELECT 'X'");
+
+        dataSource.setTestOnBorrow(false);
+        dataSource.setTestOnReturn(false);
+        dataSource.setTestWhileIdle(true);
+
+        dataSource.setPoolPreparedStatements(false);
+        dataSource.setMaxPoolPreparedStatementPerConnectionSize(20);
+
+
+        try {
+            Connection connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement("select count(*) from db_src_info");
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                System.out.println(rs.getLong(1));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

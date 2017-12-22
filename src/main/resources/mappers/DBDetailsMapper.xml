@@ -6,14 +6,14 @@
         id,  url , userName , driverName , updateTime , password 
     </sql>
 
-    <resultMap id="dbSrcInfoMap" type="com.george.dao.entities.DBDetails">
+    <resultMap id="dbSrcInfoMap" type="com.george.dao.entities.DBDetailsEntity">
         <id property="id" column="id"/>
         <result property="driverName" column="driverName"/>
         <result property="url" column="url"/>
         <result property="userName" column="userName"/>
         <result property="password" column="password"/>
         <result property="updateTime" column="updateTime"/>
-        <collection property="dataBases" ofType="com.george.dao.entities.DBSrcInfo">
+        <collection property="dataBases" ofType="com.george.dao.entities.DBSrcInfoEntity">
             <id property="id" column="id"/>
             <result property="srcName" column="srcName"/>
             <result property="srcDbName" column="srcDbName"/>
@@ -24,14 +24,14 @@
         </collection>
     </resultMap>
 
-    <select id="get" parameterType="java.lang.Long" resultType="com.george.dao.entities.DBDetails">
+    <select id="get" parameterType="java.lang.Long" resultType="com.george.dao.entities.DBDetailsEntity">
         SELECT
         <include refid="baseColumns"/>
         FROM db_details WHERE id = #{id}
     </select>
 
-    <select id="findByEntity" parameterType="com.george.dao.entities.DBDetails"
-            resultType="com.george.dao.entities.DBDetails">
+    <select id="findByEntity" parameterType="com.george.dao.entities.DBDetailsEntity"
+            resultType="com.george.dao.entities.DBDetailsEntity">
         SELECT
         <include refid="baseColumns"/>
         FROM db_details
@@ -55,7 +55,7 @@
         <include refid="com.george.utils.generators.mybatis.mapper.CRUDMapper.orderBy"/>
     </select>
 
-    <select id="getDBSrcConnInfo" parameterType="com.george.dao.entities.DBDetails" resultMap="dbSrcInfoMap">
+    <select id="getDBSrcConnInfo" parameterType="com.george.dao.entities.DBDetailsEntity" resultMap="dbSrcInfoMap">
         SELECT
             srcinf.id,
             srcinf.srcName,
@@ -70,7 +70,7 @@
         LEFT JOIN db_src_info srcinf ON srcinf.srcUrlId = dt.id
     </select>
 
-    <select id="criteriaSearch" resultType="com.george.dao.entities.DBDetails">
+    <select id="criteriaSearch" resultType="com.george.dao.entities.DBDetailsEntity">
         SELECT
         <include refid="baseColumns"/>
         FROM db_details
@@ -80,13 +80,13 @@
         <include refid="com.george.utils.generators.mybatis.mapper.CRUDMapper.orderBy"/>
     </select>
 
-    <insert id="save" parameterType="com.george.dao.entities.DBDetails" useGeneratedKeys="true" keyProperty="entity.id">
+    <insert id="save" parameterType="com.george.dao.entities.DBDetailsEntity" useGeneratedKeys="true" keyProperty="entity.id">
         INSERT INTO db_details(<include refid="baseColumns"/>) VALUE
         (#{entity.id}, #{entity.url} , #{entity.userName} , #{entity.driverName} , #{entity.updateTime} ,
         #{entity.password} )
     </insert>
 
-    <update id="update" parameterType="com.george.dao.entities.DBDetails">
+    <update id="update" parameterType="com.george.dao.entities.DBDetailsEntity">
         UPDATE db_details
         <set>
             <if test="entity.url != null">

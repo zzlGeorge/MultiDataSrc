@@ -20,7 +20,8 @@
     </settings>
 
     <typeHandlers>
-        <typeHandler handler="com.healthcloud.mybatis.type.DateTimeTypeHandler" javaType="org.joda.time.DateTime"/>
+        <typeHandler handler="com.george.utils.generators.mybatis.type.DateTimeTypeHandler"
+                     javaType="org.joda.time.DateTime"/>
     </typeHandlers>
     <environments default="development">
         <environment id="development">

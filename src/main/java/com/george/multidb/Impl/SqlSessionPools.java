@@ -1,6 +1,9 @@
-package com.george.multidb;
+package com.george.multidb.Impl;
 
+import com.george.multidb.ISqlSessionPools;
+import com.george.multidb.SqlSessionHelper;
 import com.george.utils.FileUtils;
+import org.apache.ibatis.jdbc.SQL;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
@@ -18,19 +21,20 @@ import java.util.*;
 /**
  * Created by George on 2017/8/25.
  */
-public class SqlSessionPools implements ISqlSessionPools{
+public class SqlSessionPools implements ISqlSessionPools {
 
-    private Logger log = Logger.getLogger(SqlSessionPools.class);
+    private static Logger log = Logger.getLogger(SqlSessionPools.class);
     private static final String CONF_FILE_NAME = "templet/mybatisConfig.xml";
     private static final String CONF_FILE_PATH;
 
     //模板字符串只读一次
     private static String templateContentFinal;
 
-    //存放&读取session容器
-    private Map<Integer, LinkedList<SqlSession>> sessionPools = new HashMap<Integer, LinkedList<SqlSession>>();
     public static final int SESSION_INIT_NUM = 5;//每个连接的连接数量配置
     private static final int PURSE_TIME = 1000;//停顿时间
+
+    //存放&读取session容器
+    private static Map<Integer, LinkedList<SqlSession>> sessionPools = new HashMap<Integer, LinkedList<SqlSession>>();
 
     static {
         String path = SqlSessionPools.class.getClassLoader().getResource(CONF_FILE_NAME).getPath().substring(1);
@@ -72,7 +76,7 @@ public class SqlSessionPools implements ISqlSessionPools{
         synchronized (this) {//同步取session
             while (sessionPool.size() == 0) {
                 try {
-//                    System.out.println(Thread.currentThread().getName() + ": " + "----------------等待" + id + "号sqlSessions数据库连接池-------------");
+                    System.out.println(Thread.currentThread().getName() + ": " + "----------------等待" + id + "号sqlSessions数据库连接池-------------");
                     Thread.sleep(PURSE_TIME);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -108,7 +112,7 @@ public class SqlSessionPools implements ISqlSessionPools{
         List<SqlSession> sqlSessions = new LinkedList<SqlSession>();
         String templateContent = templateContentFinal;
 
-        if (connInfo != null && connInfo.size() != 0 && mapperInfo.size() > 0) {
+        if (connInfo != null && connInfo.size() != 0 /*&& mapperInfo.size() > 0*/) {
             templateContent = templateContent.replaceAll("#driver#", connInfo.get("driver"));
             templateContent = templateContent.replaceAll("#url#", connInfo.get("url"));
             templateContent = templateContent.replaceAll("#username#", connInfo.get("username"));
@@ -141,8 +145,8 @@ public class SqlSessionPools implements ISqlSessionPools{
         List<SqlSession> sessions = null;
         Map<String, String> connMap;
         try {
-//            connMap = DBSrcInfoHelper.getHostpitalConnDetail(id);
-//            sessions = buildSqlSession(connMap, DBSrcInfoHelper.getHospitalMapperById(id), SESSION_INIT_NUM);
+            connMap = DBSrcInfoHelper.getInstance().getDBSrcConnDetail(id);
+            sessions = buildSqlSession(connMap, DBSrcInfoHelper.getInstance().getDBSrcMapperById(id), SESSION_INIT_NUM);
         } catch (Exception e) {
             log.error(e.toString());
             e.printStackTrace();

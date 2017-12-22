@@ -6,7 +6,7 @@ package com.george.utils.javaBeanCreater;
 public enum ColumnTypeEnum {
     //mysql
     VARCHAR("varchar", "java.lang.String"),
-    NUMBER("number", "java.lang.Double"),
+    NUMBER("number", "java.lang.Integer"),
     BLOB("blob", "java.lang.byte[]"),
     TEXT("text", "java.lang.String"),
     INTEGER("integer", "java.lang.Long"),
@@ -36,7 +36,13 @@ public enum ColumnTypeEnum {
     INT_IDENTITY("int identity", "java.lang.Integer"),
     BINARY("binary", "java.lang.byte[]"),
     VARBINARY("varbinary", "java.lang.byte[]"),
-    IMAGE("image", "java.lang.byte[]");
+    IMAGE("image", "java.lang.byte[]"),
+
+    //oracle
+    VARCHAR2("varchar2", "java.lang.String"),
+    RAW("row","java.lang.byte[]"),
+
+    ;
 
     private String dbType;
     private String javaType;

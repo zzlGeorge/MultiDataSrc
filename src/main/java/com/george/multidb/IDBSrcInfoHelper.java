@@ -1,8 +1,5 @@
 package com.george.multidb;
 
-import com.george.dao.entities.DBSrcInfo;
-
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,4 +10,9 @@ public interface IDBSrcInfoHelper {
      * 查找srcId号数据库的连接信息
      */
     Map<String, String> getDBSrcConnDetail(Integer srcId);
+
+    /**
+     * 通过srcId获得mapper信息
+     * */
+    Map<String, String> getDBSrcMapperById(Integer srcId);
 }

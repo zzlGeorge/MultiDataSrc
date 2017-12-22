@@ -41,5 +41,6 @@
     <mappers>
         <mapper resource="mappers/base/CRUDMapper.xml"/>
         <mapper resource="mappers/DBDetailsMapper.xml"/>
+        <mapper resource="mappers/DBSrcMappersEntityMapper.xml"/>
     </mappers>
 </configuration>

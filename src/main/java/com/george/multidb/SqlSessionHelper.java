@@ -1,5 +1,6 @@
 package com.george.multidb;
 
+import com.george.multidb.Impl.SqlSessionPools;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.log4j.Logger;
 
@@ -81,7 +82,7 @@ public class SqlSessionHelper {
      */
     private static SqlSession checkSqlSession(SqlSession session, Integer hospitalId) throws Exception {
         SqlSession resSession = session;
-        if (!resSession.getConnection().isValid(5)) { //如果SQLSession失效
+        /*if (!resSession.getConnection().isValid(5)) { //如果SQLSession失效
             log.info(hospitalId + "号池" + "已经失效，启动刷新！");
             if (hospitalId == 0) {//本地池创建方式不一样
                 createLocalPool();
@@ -89,7 +90,7 @@ public class SqlSessionHelper {
                 sessionPools.createSessionPool(hospitalId);
             }
             resSession = getSqlSession(hospitalId);
-        }
+        }*/
         return resSession;
     }
 

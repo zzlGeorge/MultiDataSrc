@@ -6,14 +6,14 @@ import java.util.Date;
 import java.util.List;
 
 @Table(name = "db_details")
-public class DBDetails {
+public class DBDetailsEntity {
     private Integer id;
     private String driverName;
     private String url;
     private String userName;
     private String password;
     private Date updateTime;
-    private List<DBSrcInfo> dataBases;//子表
+    private List<DBSrcInfoEntity> dataBases;//子表
 
     public Integer getId() {
         return id;
@@ -63,11 +63,11 @@ public class DBDetails {
         this.updateTime = updateTime;
     }
 
-    public List<DBSrcInfo> getDataBases() {
+    public List<DBSrcInfoEntity> getDataBases() {
         return dataBases;
     }
 
-    public void setDataBases(List<DBSrcInfo> dataBases) {
+    public void setDataBases(List<DBSrcInfoEntity> dataBases) {
         this.dataBases = dataBases;
     }
 }

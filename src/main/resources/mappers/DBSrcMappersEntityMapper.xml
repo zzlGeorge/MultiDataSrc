@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.george.dao.mappers.DBSrcMappersEntityMapper">
+
+    <sql id="baseColumns">
+        id,  remarks , status , mapperName , updateTime , relativePath 
+    </sql>
+
+    <select id="get" parameterType="java.lang.Long" resultType="com.george.dao.entities.DBSrcMappersEntity">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM src_mappers WHERE id = #{id}
+    </select>
+
+    <select id="getSrcMappers" parameterType="com.george.dao.entities.DBSrcMappersEntity"
+            resultType="com.george.dao.entities.DBSrcMappersEntity">
+        SELECT
+            s_m.srcId,
+            mps.*
+        FROM
+            src_and_mapper s_m
+        LEFT JOIN src_mappers mps ON mps.id = s_m.mapperId
+        <where>
+            <if test="entity != null">
+                <if test="entity.srcId != null">
+                    s_m.srcId = #{entity.srcId}
+                </if>
+            </if>
+        </where>
+    </select>
+
+    <select id="findByEntity" parameterType="com.george.dao.entities.DBSrcMappersEntity"
+            resultType="com.george.dao.entities.DBSrcMappersEntity">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM src_mappers
+        <where>
+            <if test="entity.remarks != null">
+                remarks = #{entity.remarks}
+            </if>
+            <if test="entity.status != null">
+                AND status = #{entity.status}
+            </if>
+            <if test="entity.mapperName != null">
+                AND mapperName = #{entity.mapperName}
+            </if>
+            <if test="entity.updateTime != null">
+                AND updateTime = #{entity.updateTime}
+            </if>
+            <if test="entity.relativePath != null">
+                AND relativePath = #{entity.relativePath}
+            </if>
+        </where>
+        <include refid="com.george.utils.generators.mybatis.mapper.CRUDMapper.orderBy"/>
+    </select>
+
+    <select id="criteriaSearch" resultType="com.george.dao.entities.DBSrcMappersEntity">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM src_mappers
+        <where>
+            <include refid="com.george.utils.generators.mybatis.mapper.CRUDMapper.conditions"/>
+        </where>
+        <include refid="com.george.utils.generators.mybatis.mapper.CRUDMapper.orderBy"/>
+    </select>
+
+    <insert id="save" parameterType="com.george.dao.entities.DBSrcMappersEntity" useGeneratedKeys="true"
+            keyProperty="entity.id">
+        INSERT INTO src_mappers(<include refid="baseColumns"/>) VALUE
+        (#{entity.id}, #{entity.remarks} , #{entity.status} , #{entity.mapperName} , #{entity.updateTime} ,
+        #{entity.relativePath} )
+    </insert>
+
+    <update id="update" parameterType="com.george.dao.entities.DBSrcMappersEntity">
+        UPDATE src_mappers
+        <set>
+            <if test="entity.remarks != null">
+                remarks = #{entity.remarks} ,
+            </if>
+            <if test="entity.status != null">
+                status = #{entity.status} ,
+            </if>
+            <if test="entity.mapperName != null">
+                mapperName = #{entity.mapperName} ,
+            </if>
+            <if test="entity.updateTime != null">
+                updateTime = #{entity.updateTime} ,
+            </if>
+            <if test="entity.relativePath != null">
+                relativePath = #{entity.relativePath}
+            </if>
+        </set>
+        WHERE id = #{entity.id}
+    </update>
+
+    <delete id="delete" parameterType="java.lang.Long">
+        DELETE FROM src_mappers WHERE id = #{id}
+    </delete>
+</mapper>

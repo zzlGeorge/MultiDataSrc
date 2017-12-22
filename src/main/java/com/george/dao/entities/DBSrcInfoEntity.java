@@ -5,7 +5,7 @@ import com.george.utils.generators.mybatis.generator.annotation.Table;
 import java.util.Date;
 
 @Table(name = "db_src_info")
-public class DBSrcInfo {
+public class DBSrcInfoEntity {
     private Integer id;
     private String srcName;
     private Integer srcUrlId;

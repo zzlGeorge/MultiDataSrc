@@ -1,35 +1,45 @@
-package com.george.multidb;
+package com.george.multidb.Impl;
 
-import com.george.dao.entities.DBDetails;
-import com.george.dao.entities.DBSrcInfo;
+import com.george.dao.entities.DBDetailsEntity;
+import com.george.dao.entities.DBSrcInfoEntity;
+import com.george.dao.entities.DBSrcMappersEntity;
 import com.george.dao.mappers.DBDetailsMapper;
-import com.george.utils.jdbcUtils.JdbcUtil;
+import com.george.dao.mappers.DBSrcMappersEntityMapper;
+import com.george.multidb.SqlSessionHelper;
 
-import java.sql.Connection;
 import java.util.*;
 
 /**
- * Created by George on 2017/8/9.
+ * Created by George on 2017/12/20.
  */
-public class DBSrcInfoHelper implements IDBSrcInfoHelper {
+public class DBSrcInfoHelper {
 
     /**
      * 医院  -   数据源ID
      */
     public static Map<String, String> HOSPITAL_SRCID;
-
-    private DBDetailsMapper dbDetailsMapper = SqlSessionHelper.getMapperInstance(DBDetailsMapper.class, 0);
+    private static DBSrcInfoHelper instance = new DBSrcInfoHelper();
 
     static {
         SqlSessionHelper.createLocalPool();
 //        HOSPITAL_SRCID = getHospitalName_SrcID();
     }
 
+    private DBSrcInfoHelper() {
+    }
+
+    public static DBSrcInfoHelper getInstance() {
+        return instance;
+    }
+
     public Map<String, String> getDBSrcConnDetail(Integer srcId) {
         Map<String, String> resultMap = new HashMap<String, String>();
-        List<DBDetails> data = dbDetailsMapper.getDBSrcConnInfo(null);
-        for (DBDetails dbDetails : data) {
-            DBSrcInfo targetInfo = findTargetDbSrcInfo(dbDetails.getDataBases(), srcId);
+
+        DBDetailsMapper dbDetailsMapper = SqlSessionHelper.getMapperInstance(DBDetailsMapper.class, 0);
+        List<DBDetailsEntity> data = dbDetailsMapper.getDBSrcConnInfo(null);
+
+        for (DBDetailsEntity dbDetails : data) {
+            DBSrcInfoEntity targetInfo = findTargetDbSrcInfo(dbDetails.getDataBases(), srcId);
             if (targetInfo != null) {
                 resultMap.put("driver", dbDetails.getDriverName());
 
@@ -47,44 +57,29 @@ public class DBSrcInfoHelper implements IDBSrcInfoHelper {
     /**
      * 找到目标数据库信息
      */
-    private DBSrcInfo findTargetDbSrcInfo(List<DBSrcInfo> sets, Integer targetId) {
-        for (DBSrcInfo info : sets) {
+    private DBSrcInfoEntity findTargetDbSrcInfo(List<DBSrcInfoEntity> sets, Integer targetId) {
+        for (DBSrcInfoEntity info : sets) {
             if (info.getId() == targetId)
                 return info;
         }
         return null;
     }
 
+    public Map<String, String> getDBSrcMapperById(Integer srcId) {
+        Map<String, String> resMap = new HashMap<String, String>();
 
-    //    public static Map<String, String> getHostpitalConnDetail(Integer hospitalId) throws Exception {
-//        Map<String, String> resultMap = new HashMap<String, String>();
-//        HospitalDbDao dao = SqlSessionHelper.getMapperInstance(HospitalDbDao.class, 0);
-//        HospitalDbInfoEntity entity = dao.getHospitalConnDetail(hospitalId);
-//        if (entity != null) {
-//            resultMap.put("driver", entity.getDriver_name());
-//            resultMap.put("url", entity.getUrl());
-//            resultMap.put("username", entity.getUser());
-//            resultMap.put("password", entity.getPassword());
-//        }
-//        return resultMap;
-//    }
-//
-//    /**
-//     * 获取某家医院的所有mapper信息
-//     */
-//    public static Map<String, String> getHospitalMapperById(Integer id) throws Exception {
-//        Map<String, String> mapper = new HashMap<String, String>();
-//        HospitalDbDao dao = SqlSessionHelper.getMapperInstance(HospitalDbDao.class, 0);
-////        List<HospitalMapperEntity> list = dao.getHospitalMapperById(id);
-//        List<HospitalMapperEntity> list = dao.getHospitalMappersNew(id.toString());
-//        for (HospitalMapperEntity entity : list) {
-//            String relativePath = entity.getRelative_path();
-//            String mapperName = entity.getMapper_name();
-//            String totalPath = relativePath + "/" + mapperName;
-//            mapper.put(mapperName, totalPath);
-//        }
-//        return mapper;
-//    }
+        DBSrcMappersEntity entityParam = new DBSrcMappersEntity();
+        entityParam.setSrcId(srcId);
+
+        DBSrcMappersEntityMapper dbSrcMappersEntityMapper = SqlSessionHelper.getMapperInstance(DBSrcMappersEntityMapper.class, 0);
+        List<DBSrcMappersEntity> mappers = dbSrcMappersEntityMapper.getSrcMappers(entityParam);
+
+        for (DBSrcMappersEntity entity : mappers) {
+            resMap.put(entity.getMapperName(), entity.getRelativePath() + entity.getMapperName());
+        }
+        return resMap;
+    }
+
 //
 //    /**
 //     * 获取 医院名 - 医院数据源ID 关系

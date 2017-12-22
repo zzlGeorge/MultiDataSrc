@@ -1,6 +1,6 @@
 package com.george.generator;
 
-import com.george.dao.entities.DBDetails;
+import com.george.dao.entities.DBSrcMappersEntity;
 import com.george.general.Constants;
 import com.george.multidb.SqlSessionHelper;
 import com.george.utils.generators.mybatis.generator.MapperGenerator;
@@ -21,7 +21,6 @@ import java.sql.SQLException;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:freemarker.xml")
-//@ContextConfiguration("classpath:freemarker.xml")
 public class GeneratorTool {
 
     @Autowired
@@ -32,7 +31,7 @@ public class GeneratorTool {
      */
     @Test
     public void generateMapperTools() {
-        GeneratorMethods.generateMapper(mapperGenerator, DBDetails.class,
+        GeneratorMethods.generateMapper(mapperGenerator, DBSrcMappersEntity.class,
                 "com.george.dao.mappers",
                 "\\src\\main\\resources\\mappers");
         System.out.println("生成完毕。");
@@ -43,10 +42,10 @@ public class GeneratorTool {
      */
     @Test
     public void generateJavaBeanFromDB() {
-        Connection connection = SqlSessionHelper.getPoolConn(0);//指定数据库连接
+        Connection connection = SqlSessionHelper.getPoolConn(3);//指定数据库连接
         try {
             boolean res = BeanProcess.generateJavaBeanFromDB(Constants.ROOT_PATH + "/src/main/java", "com.george.dao.entities",
-                    connection, "db_src_info", "DBSrcInfo");//生成javabean文件于指定位置
+                    connection, "VALIDITYWARNING", "ValidityWarning");//生成javabean文件于指定位置
             connection.close();
         } catch (SQLException e) {
             e.printStackTrace();

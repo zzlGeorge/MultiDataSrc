@@ -1,64 +1,63 @@
 package com.george.utils.jdbcUtils;
 
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.util.Properties;
 
 public final class JdbcUtil {
-    private String driver = "";
-    private String url = "";
-    private String user = "";
-    private String password = "";
+    // 表示定义数据库的用户名
+    private static String USERNAME;
+
+    // 定义数据库的密码
+    private static String PASSWORD;
+
+    // 定义数据库的驱动信息
+    private static String DRIVER;
+
+    // 定义访问数据库的地址
+    private static String URL;
+
+    static {
+        //加载数据库配置信息，并给相关的属性赋值
+        loadConfig();
+    }
+
+    /**
+     * 加载数据库配置信息，并给相关的属性赋值
+     */
+    private static void loadConfig() {
+        try {
+            InputStream inStream = JdbcUtil.class
+                    .getResourceAsStream("/jdbc.properties");
+            Properties prop = new Properties();
+            prop.load(inStream);
+            USERNAME = prop.getProperty("jdbc.username");
+            PASSWORD = prop.getProperty("jdbc.password");
+            DRIVER = prop.getProperty("jdbc.driver");
+            URL = prop.getProperty("jdbc.url");
+        } catch (Exception e) {
+            throw new RuntimeException("读取数据库配置文件异常！", e);
+        }
+    }
 
     public JdbcUtil() {
+
     }
 
-    public JdbcUtil(String driver, String url, String user, String password) {
-        this.driver = driver;
-        this.url = url;
-        this.user = user;
-        this.password = password;
-    }
-
-
-    public Connection getConnection() throws SQLException {
+    /**
+     * 获取数据库连接
+     *
+     * @return 数据库连接
+     */
+    public Connection getConnection() {
+        Connection connection;
         try {
-            Class.forName(getDriver());
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            Class.forName(DRIVER); // 注册驱动
+            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD); // 获取连接
+        } catch (Exception e) {
+            throw new RuntimeException("get connection error!", e);
         }
-        return DriverManager.getConnection(getUrl(), getUser(), getPassword());
-    }
-
-    public String getDriver() {
-        return driver;
-    }
-
-    public void setDriver(String driver) {
-        this.driver = driver;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+        return connection;
     }
 }

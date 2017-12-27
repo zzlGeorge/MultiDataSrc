@@ -5,9 +5,12 @@ import com.george.dao.mappers.DBSrcMappersEntityMapper;
 import com.george.multidb.Impl.DBSrcInfoHelper;
 import com.george.multidb.SqlSessionHelper;
 import com.george.utils.jdbcUtils.JdbcDao;
+import com.george.utils.jdbcUtils.JdbcUtil;
 import org.junit.Test;
 
 import java.sql.*;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by George on 2017/12/12.
@@ -16,10 +19,14 @@ public class CommonTest {
     @Test
     public void testGetConn() {
         Connection connection = SqlSessionHelper.getPoolConn(1);
-        JdbcDao dao = new JdbcDao();
+
         try {
-            ResultSet records = dao.getRecords(connection, "select * from db_src_info");
-            System.out.println(records);
+            JdbcUtil jdbcUtil = new JdbcUtil();
+            List<Map<String, Object>> result = JdbcDao.findResult(jdbcUtil.getConnection(),
+                    "select id from db_src_info", null);
+            for (Map<String, Object> m : result) {
+                System.out.println(m);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }

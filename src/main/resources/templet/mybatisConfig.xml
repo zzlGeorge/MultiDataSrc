@@ -4,6 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
 
+    <properties resource="jdbc.properties"></properties>
     <settings>
         <setting name="cacheEnabled" value="false"/>
         <setting name="lazyLoadingEnabled" value="true"/>
@@ -47,8 +48,23 @@
                 <property name="username" value="#username#"/>
                 <property name="password" value="#password#"/>
                 <!--<property name="initialSize" value="0" />-->
-                <property name="maxActive" value="20"/>
-                <property name="minIdle" value="0"/>
+                <!--<property name="maxActive" value="20"/>
+                <property name="minIdle" value="0"/>-->
+
+                <property name="maxActive" value="${maxActive}"/>
+                <property name="initialSize" value="${initialSize}"/>
+                <property name="maxWait" value="${maxWait}"/>
+                <property name="minIdle" value="${minIdle}"/>
+                <property name="timeBetweenEvictionRunsMillis" value="${timeBetweenEvictionRunsMillis}"/>
+                <property name="minEvictableIdleTimeMillis" value="${minEvictableIdleTimeMillis}"/>
+                <property name="validationQuery" value="${validationQuery}"/>
+                <property name="testWhileIdle" value="${testWhileIdle}"/>
+                <property name="testOnBorrow" value="${testOnBorrow}"/>
+                <property name="testOnReturn" value="${testOnReturn}"/>
+                <property name="maxOpenPreparedStatements" value="${maxOpenPreparedStatements}"/>
+                <property name="removeAbandoned" value="${removeAbandoned}"/>
+                <property name="removeAbandonedTimeout" value="${removeAbandonedTimeout}"/>
+                <property name="logAbandoned" value="${logAbandoned}"/>
             </dataSource>
         </environment>
     </environments>

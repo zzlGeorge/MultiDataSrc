@@ -2,6 +2,7 @@ package com.george;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.george.dao.mappers.DBSrcMappersEntityMapper;
+import com.george.general.Constants;
 import com.george.multidb.Impl.DBSrcInfoHelper;
 import com.george.multidb.SqlSessionHelper;
 import com.george.utils.jdbcUtils.JdbcDao;
@@ -16,6 +17,12 @@ import java.util.Map;
  * Created by George on 2017/12/12.
  */
 public class CommonTest {
+
+    @Test
+    public void testCommon(){
+        System.out.println(Constants.ROOT_PATH);
+    }
+
     @Test
     public void testGetConn() {
         Connection connection = SqlSessionHelper.getPoolConn(1);

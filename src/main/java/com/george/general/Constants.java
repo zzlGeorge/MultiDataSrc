@@ -8,6 +8,7 @@ import java.net.URLDecoder;
  */
 public final class Constants {
     public static final String ROOT_PATH;//项目根路径
+    public static final String PACKAGE_NAME = "com.george";
 
     static {
         StringBuilder test = new StringBuilder(Constants.class.getClassLoader().getResource(".").getPath());

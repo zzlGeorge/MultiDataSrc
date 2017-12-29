@@ -57,8 +57,8 @@ public class FreemarkerDemo {
         model.put("classPath", "com.george");
         model.put("className", "AutoCodeDemo");
         model.put("helloWorld", "通过简单的 <代码自动生产程序> 演示 FreeMarker的HelloWorld！");
-        freemarkerUtil.getContent(model, "hello.ftl");
-//        freemarkerUtil.create(model, "hello.ftl", CLASS_PATH + "/AutoCodeDemo.java");
+//        freemarkerUtil.getContent(model, "hello.ftl");
+        freemarkerUtil.create(model, "hello.ftl", CLASS_PATH + "/AutoCodeDemo.java");
     }
 
 }

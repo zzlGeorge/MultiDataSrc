@@ -1,0 +1,15 @@
+.inner {
+    margin-left: 26%;
+}
+
+.inner iframe {
+    /*border-radius: 5px;*/
+}
+
+.inner .title{
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    background: rgba(39, 101, 111, 0.54);
+    width: 100%;
+    height: 46px;
+}

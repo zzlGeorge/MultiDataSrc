@@ -9,3 +9,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> <%-- jstl 标签 --%>
 <c:set var="ctx" value="${rc.contextPath}"/>
 <c:set var="assets" value="${ctx}/assets"/>
+<c:set var="css" value="${ctx}/css"/>
+<c:set var="js" value="${ctx}/js"/>
+
+<c:set var="plugins" value="${ctx}/assets/plugins"/>

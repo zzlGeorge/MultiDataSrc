@@ -9,7 +9,14 @@
 .inner .title{
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
-    background: rgba(39, 101, 111, 0.54);
+    background: #f6f6f6;
     width: 100%;
-    height: 46px;
+    height: 33px;
+    padding-top: 10px;
+    visibility: hidden;
+}
+
+.inner .title .titleTxt{
+    margin-left: 34px;
+    color: #000000;
 }

@@ -6,7 +6,7 @@ import java.util.Date;
 
 @Table(name = "db_src_info")
 public class DBSrcInfoEntity {
-    private Integer id;
+    private Integer dbId;
     private String srcName;
     private Integer srcUrlId;
     private String srcDbName;    //数据库名
@@ -14,12 +14,12 @@ public class DBSrcInfoEntity {
     private Integer status;    //状态；1：启用  0：不启用
     private Date updateTime;
 
-    public Integer getId() {
-        return id;
+    public Integer getDbId() {
+        return dbId;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setDbId(Integer dbId) {
+        this.dbId = dbId;
     }
 
     public String getSrcName() {

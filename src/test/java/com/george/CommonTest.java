@@ -25,7 +25,7 @@ public class CommonTest {
 
     @Test
     public void testGetConn() {
-        Connection connection = SqlSessionHelper.getPoolConn(1);
+        Connection connection = SqlSessionHelper.getPoolConn(4);
 
         try {
             JdbcUtil jdbcUtil = new JdbcUtil();

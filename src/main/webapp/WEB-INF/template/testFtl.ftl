@@ -1,5 +1,4 @@
-<#include "commonFtlVal.ftl" encoding="UTF-8" parse=true>
-
+<#include "../page/common/commonFtlVal.ftl" encoding="UTF-8" parse=true>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -9,8 +8,8 @@
     <title>springMVC freemarker测试</title>
 
     <!-- Bootstrap -->
-    <link href="/assets/bootstrap-3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/assets/bootstrap-table/css/bootstrap-table.min.css">
+    <link href="/assets/plugins/bootstrap-3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/plugins/bootstrap-table/css/bootstrap-table.min.css">
 
     <!--[if lt IE 9]>
     <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -20,10 +19,10 @@
 <body>
 <h1>${"hello,"+username}</h1> ${"项目根路径："+request.contextPath}
 <script src="/js/jquery/jquery.min.js"></script>
-<script src="/assets/bootstrap-3.3.7/js/bootstrap.min.js"></script>
-<script src="/assets/bootstrap-table/js/bootstrap.min.js"></script>
-<script src="/assets/bootstrap-table/js/bootstrap-table.js"></script>
-<script src="/assets/bootstrap-table/js/bootstrap-table-zh-CN.js"></script>
+<script src="/assets/plugins/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+<script src="/assets/plugins/bootstrap-table/js/bootstrap.min.js"></script>
+<script src="/assets/plugins/bootstrap-table/js/bootstrap-table.js"></script>
+<script src="/assets/plugins/bootstrap-table/js/bootstrap-table-zh-CN.js"></script>
 
 </body>
 </html>

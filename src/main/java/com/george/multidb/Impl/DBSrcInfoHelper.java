@@ -59,7 +59,7 @@ public class DBSrcInfoHelper {
      */
     private DBSrcInfoEntity findTargetDbSrcInfo(List<DBSrcInfoEntity> sets, Integer targetId) {
         for (DBSrcInfoEntity info : sets) {
-            if (info.getId() == targetId)
+            if (info.getDbId() == targetId)
                 return info;
         }
         return null;

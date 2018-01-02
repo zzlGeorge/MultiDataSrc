@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>数据源信息</title>
+
+    <!-- Bootstrap -->
+    <link href="/assets/plugins/bootstrap-3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/plugins/bootstrap-table/css/bootstrap-table.min.css">
+
+    <style>
+        .wrapper {
+            padding: 20px 15px
+        }
+
+        .wrapper .search {
+
+        }
+
+        .wrapper .content {
+
+        }
+
+        #dbSrc {
+            width: 300px;
+        }
+    </style>
+
+    <!--[if lt IE 9]>
+    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="wrapper">
+    <div class="search">
+        <div class="form-group">
+            <label for="dbSrc">数据源：</label>
+            <select id="dbSrc" class="form-control">
+                <option value="">全部</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="tableContent">
+            <table id="dbSrcTb"></table>
+        </div>
+    </div>
+</div>
+
+<script src="/js/jquery/jquery.min.js"></script>
+<script src="/assets/plugins/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+<script src="/assets/plugins/bootstrap-table/js/bootstrap.min.js"></script>
+<script src="/assets/plugins/bootstrap-table/js/bootstrap-table.js"></script>
+<script src="/assets/plugins/bootstrap-table/js/bootstrap-table-zh-CN.js"></script>
+<script src="/js/common.js"></script>
+
+<script>
+    var cols = [];
+
+    $(function () {
+        initSrcNames();
+//        initTableServer('#dbSrcTb', cols, '');
+    });
+
+    function initSrcNames() {
+        $.ajax({
+            type: "POST",
+            url: "/hello/baseSrcInfo",
+            data: {},
+            success: function (msg) {
+                var optionsHtml = '<option value="0">全部</option>';
+                var data = msg.dataList;
+                for (var i = 0; i < data.length; i++) {
+                    var obj = data[i];
+                    optionsHtml += '<option value="' + obj["id"] + '">' + obj["srcName"] + '</option>';
+                }
+                $('#dbSrc').html(optionsHtml);
+            }
+        });
+    }
+</script>
+</body>
+</html>

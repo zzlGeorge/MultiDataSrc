@@ -3,7 +3,7 @@
 <mapper namespace="com.george.dao.mappers.DBDetailsMapper">
 
     <sql id="baseColumns">
-        id,  url , userName , driverName , updateTime , password 
+        id,  url , userName , driverName , updateTime , password
     </sql>
 
     <resultMap id="dbSrcInfoMap" type="com.george.dao.entities.DBDetailsEntity">
@@ -14,7 +14,7 @@
         <result property="password" column="password"/>
         <result property="updateTime" column="updateTime"/>
         <collection property="dataBases" ofType="com.george.dao.entities.DBSrcInfoEntity">
-            <id property="id" column="id"/>
+            <id property="dbId" column="dbId"/>
             <result property="srcName" column="srcName"/>
             <result property="srcDbName" column="srcDbName"/>
             <result property="srcUrlId" column="srcUrlId"/>
@@ -57,17 +57,43 @@
 
     <select id="getDBSrcConnInfo" parameterType="com.george.dao.entities.DBDetailsEntity" resultMap="dbSrcInfoMap">
         SELECT
-            srcinf.id,
+            dt.*,
+            srcinf.id dbId,
             srcinf.srcName,
             srcinf.srcDbName,
             srcinf.srcUrlId,
             srcinf.`status`,
             srcinf.type,
-            srcinf.updateTime,
-            dt.*
+            srcinf.updateTime
         FROM
             db_details dt
         LEFT JOIN db_src_info srcinf ON srcinf.srcUrlId = dt.id
+        WHERE srcinf.status = 1
+    </select>
+
+    <select id="getSrcInfo" parameterType="com.george.dao.entities.DBSrcInfoEntity" resultType="com.george.dao.entities.DBSrcInfoEntity">
+        SELECT * FROM db_src_info
+        <where>
+            1=1
+            <if test="entity.id != null">
+               AND id = #{entity.id}
+            </if>
+            <if test="entity.srcName != null">
+                AND srcName = #{entity.srcName}
+            </if>
+            <if test="entity.srcUrlId != null">
+                AND srcUrlId = #{entity.srcUrlId}
+            </if>
+            <if test="entity.srcDbName != null">
+                AND srcDbName = #{entity.srcDbName}
+            </if>
+            <if test="entity.type != null">
+                AND `type` = #{entity.type}
+            </if>
+            <if test="entity.status != null">
+                AND status = #{entity.status}
+            </if>
+        </where>
     </select>
 
     <select id="criteriaSearch" resultType="com.george.dao.entities.DBDetailsEntity">

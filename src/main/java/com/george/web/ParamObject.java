@@ -8,8 +8,15 @@ public class ParamObject {
     private boolean result;
     private int pageSize;
     private int pageNumber;
+    private int totalDisplaySize;
     private String message;
     private Object dataList;
+
+    public ParamObject() {
+        this.pageNumber = 1;
+        this.pageSize = 5;
+        this.result = true;
+    }
 
     public int getCode() {
         return code;
@@ -41,6 +48,14 @@ public class ParamObject {
 
     public void setPageNumber(int pageNumber) {
         this.pageNumber = pageNumber;
+    }
+
+    public int getTotalDisplaySize() {
+        return totalDisplaySize;
+    }
+
+    public void setTotalDisplaySize(int totalDisplaySize) {
+        this.totalDisplaySize = totalDisplaySize;
     }
 
     public String getMessage() {

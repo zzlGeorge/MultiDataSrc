@@ -14,5 +14,7 @@ import java.util.List;
 public interface DBDetailsMapper extends CRUDMapper<DBDetailsEntity, Long> {
     List<DBDetailsEntity> getDBSrcConnInfo(@Param("entity") DBDetailsEntity entity);
 
-    List<DBSrcInfoEntity> getSrcInfo(@Param("entity")DBSrcInfoEntity entity);
+    List<DBSrcInfoEntity> getSrcInfo(@Param("entity") DBSrcInfoEntity entity);
+
+    List<DBDetailsEntity> findByEntity(@Param("entity") DBDetailsEntity entity);
 }

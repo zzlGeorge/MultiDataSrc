@@ -50,40 +50,4 @@ public class HelloController {
         return "template/testFtl";
     }
 
-    @RequestMapping(value = "/dbSrcView", method = RequestMethod.GET)
-    public String dbSrcViewPage() {
-        return "page/dbSrcView";
-    }
-
-
-
-
-    @RequestMapping(value = "/baseSrcInfo", method = RequestMethod.GET)
-    @ResponseBody
-    public Object baseSrcInfoGET(ParamObject param, DBSrcInfoEntity entity) {
-        return baseSrcInfo(param, entity);
-    }
-
-    @RequestMapping(value = "/baseSrcInfo", method = RequestMethod.POST)
-    @ResponseBody
-    public Object baseSrcInfo(ParamObject param, DBSrcInfoEntity entity) {
-        List<DBSrcInfoEntity> data = databaseSrcService.getSrcInfo(entity);
-        param.setDataList(data);
-        return param;
-    }
-
-    @RequestMapping(value = "/getSrcInfo", method = RequestMethod.GET)
-    @ResponseBody
-    public Object getSrcInfoGET(ParamObject param, DBDetailsEntity entity) {
-        return getSrcInfo(param, entity);
-    }
-
-    @RequestMapping(value = "/getSrcInfo", method = RequestMethod.POST)
-    @ResponseBody
-    public Object getSrcInfo(ParamObject param, DBDetailsEntity entity) {
-        List<DBDetailsEntity> data = databaseSrcService.getSrcDetailsInfo(entity);
-        param.setDataList(data);
-        return param;
-    }
-
 }

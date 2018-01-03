@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>数据源信息</title>
+    <title>数据库连接信息管理</title>
 
     <!-- Bootstrap -->
     <link href="/assets/plugins/bootstrap-3.3.7/css/bootstrap.min.css" rel="stylesheet">
@@ -30,10 +30,6 @@
         #dbSrc {
             width: 180px;
         }
-
-        .modal-backdrop {
-            background-color: rgba(0, 0, 0, 0);
-        }
     </style>
 
     <!--[if lt IE 9]>
@@ -54,7 +50,7 @@
 
     <div class="content">
         <div class="tableContent">
-            <table id="dbSrcTb"></table>
+            <table id="dbSrcUrlTb"></table>
         </div>
     </div>
 </div>
@@ -68,22 +64,20 @@
 
 <script>
     var cols = [
-        {field: 'dbId', title: '数据源ID'},
-        {field: 'srcName', title: '名称'},
-        {field: 'srcDbName', title: '数据库名'},
+        {field: 'id', title: '序号'},
         {
-            field: 'type', title: '类型',
+            field: 'driverName', title: '驱动类型',
             formatter: function (value, row, index) {
                 var type = '';
                 switch (value) {
-                    case 1:
+                    case "com.mysql.jdbc.Driver":
                         type = 'MySql';
                         break;
-                    case 2:
+                    case "com.microsoft.sqlserver.jdbc.SQLServerDriver":
                         type = 'SqlServer';
                         break;
-                    case 3:
-                        type = 'Oracle';
+                    case "oracle.jdbc.driver.OracleDriver":
+                        type = 'MySql';
                         break;
                     default:
                         break;
@@ -92,12 +86,18 @@
             }
         },
         {
-            field: 'status', title: '状态',
+            field: 'url', title: '链接',
             formatter: function (value, row, index) {
-                if (value == 1)
-                    return '启用';
-                else if (value == 0)
-                    return '停用';
+                if (row["driverName"] === 'com.microsoft.sqlserver.jdbc.SQLServerDriver')
+                    return value.substr(0, value.indexOf(';database'));
+                return value;
+            }
+        },
+        {field: 'userName', title: '用户名'},
+        {
+            field: 'password', title: '密码',
+            formatter: function (value, row, index) {
+                return value;
             }
         },
         {
@@ -107,17 +107,16 @@
             }
         },
         {
-            field: '', title: '操作',
-            formatter: function (value, row, index) {
-                var html = '<a style="cursor: pointer" onclick="viewUrlDetails(' + row["srcUrlId"] + ')">查看连接信息</a>';
-                return html;
+            field:'',title:'操作',
+            formatter:function (value,row,index) {
+
             }
         }
     ];
 
     $(function () {
         initSrcNames('#dbSrc');
-        initTableServer('#dbSrcTb', cols, '/dbSrc/srcInfoView', searchParams);
+        initTableServer('#dbSrcUrlTb', cols, '/dbSrc/getSrcUrlInfo', searchParams);
     });
 
     function searchParams(params) {
@@ -125,49 +124,6 @@
         params["pageNumber"] = params.offset / params.limit + 1;
         return params;
     }
-
-    function viewUrlDetails(id) {
-//        $('#my-modal-alert').modal('toggle');
-        $.ajax({
-            type: "post",
-            url: "/dbSrc/getOneUrlInfo",
-            data: {id: id},
-            success: function (msg) {
-                var contentHtml = '';
-                var data = msg.dataList[0];
-                contentHtml += '<div style="margin: 5px 5px"><span>驱动名：' + data["driverName"] + '</span>' +
-                    '<p><span>url：' + data["url"] + '</span></p>' +
-                    '<p><span>用户名：' + data["userName"] + '</span><span>密码：' + data["password"] + '</span></p></div>';
-                showMode(contentHtml);
-            }
-        });
-    }
-
-    function showMode(content) {
-        $('#contentBody').html(content);
-        $('#my-modal-alert').modal('toggle');
-    }
 </script>
-
-<!-- bootstrap模糊框 -->
-<div class="modal fade" id="my-modal-alert">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">
-                    <span aria-hidden="true">&times</span><span class="sr-only">Close</span>
-                </button>
-                <h4 class="modal-title" id="modal-title">模态框</h4><span id="num"></span>
-            </div>
-            <div class="modal-body" id="contentBody">
-                内容
-            </div>
-            <div class="modal-footer" id="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary">保存</button>
-            </div>
-        </div>
-    </div>
-</div>
 </body>
 </html>

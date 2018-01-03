@@ -25,4 +25,8 @@ public class DatabaseSrcServiceImpl implements DatabaseSrcService {
     public List<DBDetailsEntity> getSrcDetailsInfo(DBDetailsEntity entity) {
         return dbDetailsMapper.getDBSrcConnInfo(entity);
     }
+
+    public List<DBDetailsEntity> getSrcUrlInfo(DBDetailsEntity entity) {
+        return dbDetailsMapper.findByEntity(entity);
+    }
 }

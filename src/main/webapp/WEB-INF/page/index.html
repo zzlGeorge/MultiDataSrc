@@ -80,11 +80,10 @@
             <div class="span3">
                 <div class="sidebar">
                     <ul class="widget widget-menu unstyled">
-                        <li class="active"><a href="#" onclick="showSrc('/hello/inner2Demo','测试1')"><i
-                                class="menu-icon icon-dashboard"></i>测试一
+                        <li class="active"><a href="#" onclick="showSrc('/dbSrc/dbSrcView','数据库管理')"><i
+                                class="menu-icon icon-dashboard"></i>数据库管理
                         </a></li>
-                        <li><a href="#" onclick="showSrc('/hello/innerDemo','测试2')"><i class="menu-icon icon-bullhorn"></i>News
-                            Feed </a>
+                        <li><a href="#" onclick="showSrc('/dbSrc/dbSrcUrlView','数据库服务信息管理')"><i class="menu-icon icon-bullhorn"></i>数据库服务信息管理</a>
                         </li>
                         <li><a href="#" onclick="showSrc()"><i class="menu-icon icon-inbox"></i>Inbox <b
                                 class="label green pull-right">
@@ -158,6 +157,32 @@
         $('.titleTxt').html(title);
     }
 
+    function showMode(content) {
+        $('#contentBody').html(content);
+        $('#my-modal-alert').modal('toggle');
+    }
+
 </script>
+
+<!-- bootstrap模糊框 -->
+<div class="modal fade" id="my-modal-alert">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times</span><span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="modal-title">模态框</h4><span id="num"></span>
+            </div>
+            <div class="modal-body" id="contentBody">
+                内容
+            </div>
+            <div class="modal-footer" id="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

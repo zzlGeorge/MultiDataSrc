@@ -46,7 +46,7 @@ public class PreparePaginationInterceptor extends BaseInterceptor {
 
             // //拦截需要分页的SQL
             // // if (mappedStatement.getId().matches(_SQL_PATTERN)) {
-            // if (StringUtils.indexOfIgnoreCase(mappedStatement.getId(),
+            // if (CommonUtils.indexOfIgnoreCase(mappedStatement.getId(),
             // _SQL_PATTERN) != -1) {
             BoundSql boundSql = delegate.getBoundSql();
             // 分页SQL<select>中parameterType属性对应的实体参数，即Mapper接口中执行分页方法的参数,该参数不得为空

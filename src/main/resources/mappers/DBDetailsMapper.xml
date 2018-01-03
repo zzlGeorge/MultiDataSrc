@@ -36,6 +36,9 @@
         <include refid="baseColumns"/>
         FROM db_details
         <where>
+            <if test="entity.id != null">
+                id = #{entity.id}
+            </if>
             <if test="entity.url != null">
                 url = #{entity.url}
             </if>
@@ -52,7 +55,6 @@
                 AND password = #{entity.password}
             </if>
         </where>
-        <include refid="com.george.utils.generators.mybatis.mapper.CRUDMapper.orderBy"/>
     </select>
 
     <select id="getDBSrcConnInfo" parameterType="com.george.dao.entities.DBDetailsEntity" resultMap="dbSrcInfoMap">
@@ -71,12 +73,21 @@
         WHERE srcinf.status = 1
     </select>
 
-    <select id="getSrcInfo" parameterType="com.george.dao.entities.DBSrcInfoEntity" resultType="com.george.dao.entities.DBSrcInfoEntity">
-        SELECT * FROM db_src_info
+    <select id="getSrcInfo" parameterType="com.george.dao.entities.DBSrcInfoEntity"
+            resultType="com.george.dao.entities.DBSrcInfoEntity">
+        SELECT
+        id dbId,
+        srcName,
+        srcUrlId,
+        srcDbName,
+        `type`,
+        status,
+        updateTime
+        FROM db_src_info
         <where>
             1=1
-            <if test="entity.id != null">
-               AND id = #{entity.id}
+            <if test="entity.dbId != null">
+                AND id = #{entity.dbId}
             </if>
             <if test="entity.srcName != null">
                 AND srcName = #{entity.srcName}
@@ -106,7 +117,8 @@
         <include refid="com.george.utils.generators.mybatis.mapper.CRUDMapper.orderBy"/>
     </select>
 
-    <insert id="save" parameterType="com.george.dao.entities.DBDetailsEntity" useGeneratedKeys="true" keyProperty="entity.id">
+    <insert id="save" parameterType="com.george.dao.entities.DBDetailsEntity" useGeneratedKeys="true"
+            keyProperty="entity.id">
         INSERT INTO db_details(<include refid="baseColumns"/>) VALUE
         (#{entity.id}, #{entity.url} , #{entity.userName} , #{entity.driverName} , #{entity.updateTime} ,
         #{entity.password} )

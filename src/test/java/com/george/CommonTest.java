@@ -3,11 +3,14 @@ package com.george;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.george.dao.mappers.DBSrcMappersEntityMapper;
 import com.george.general.Constants;
-import com.george.multidb.Impl.DBSrcInfoHelper;
 import com.george.multidb.SqlSessionHelper;
 import com.george.utils.jdbcUtils.JdbcDao;
 import com.george.utils.jdbcUtils.JdbcUtil;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.sql.*;
 import java.util.List;
@@ -16,16 +19,25 @@ import java.util.Map;
 /**
  * Created by George on 2017/12/12.
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("classpath:spring-config/druid.xml")
 public class CommonTest {
 
+    @Autowired
+    private DruidDataSource druidDataSource;
     @Test
     public void testCommon(){
+        try {
+            druidDataSource.getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         System.out.println(Constants.ROOT_PATH);
     }
 
     @Test
     public void testGetConn() {
-        Connection connection = SqlSessionHelper.getPoolConn(4);
+        Connection connection = SqlSessionHelper.getPoolConn(2);
 
         try {
             JdbcUtil jdbcUtil = new JdbcUtil();

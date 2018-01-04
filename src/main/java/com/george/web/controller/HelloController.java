@@ -28,7 +28,7 @@ public class HelloController {
 
     @RequestMapping(value = "/test", method = RequestMethod.GET)
     public String testPage() {
-//        Object o = SqlSessionHelper.getPools();
+        Object o = SqlSessionHelper.getPools();
         return "test";
     }
 

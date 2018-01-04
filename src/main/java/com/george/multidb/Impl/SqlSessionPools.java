@@ -30,7 +30,7 @@ public class SqlSessionPools implements ISqlSessionPools {
     //模板字符串只读一次
     private static String templateContentFinal;
 
-    public static final int SESSION_INIT_NUM = 10;//每个连接的连接数量配置
+    public static final int SESSION_INIT_NUM = 5;//每个连接的连接数量配置
     private static final int PURSE_TIME = 1000;//停顿时间
 
     //存放&读取session容器

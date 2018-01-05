@@ -28,12 +28,19 @@ public class MultiDatabaseInitListener implements ServletContextListener {
         try {
             JdbcUtil jdbcUtil = new JdbcUtil();
             List<Map<String, Object>> srcIds = JdbcDao.findResult(jdbcUtil.getConnection(),
-                    "select id from db_src_info", null);
+                    "select id from db_src_info where status=1", null);
+            int count = 0;
             for (Map<String, Object> m : srcIds) {
                 Integer id = (Integer) m.get("id");
                 System.out.println("#####   Creating NO.[" + id + "] Database Src.");
-                SqlSessionHelper.createPool(id);
+                try {
+                    SqlSessionHelper.createPool(id);
+                    count++;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
+            System.out.println("**  [" + count + "] databases created successfully!  **");
         } catch (SQLException e) {
             e.printStackTrace();
         }

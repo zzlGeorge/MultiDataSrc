@@ -2,9 +2,12 @@ package com.george.multidb;
 
 import com.george.multidb.Impl.SqlSessionPools;
 import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -21,6 +24,7 @@ public class SqlSessionHelper {
     public static SqlSession getSqlSession(Integer id) {
         return sessionPools.getSession(id);
     }
+
 
     /**
      * 获取id号池的一个连接
@@ -39,6 +43,28 @@ public class SqlSessionHelper {
         Connection resConn = targetSession.getConnection();
         sessionPools.closeSession(targetSession);
         return resConn;
+    }
+
+    /**
+     * 从数据源中获取一个数据库连接
+     */
+    public static Connection getConnectionFromDataSource(Integer id) {
+        SqlSessionFactory factory = sessionPools.getSqlSessionFactory(id);
+        Connection connection = null;
+        try {
+            connection = factory.getConfiguration().getEnvironment().getDataSource().getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return connection;
+    }
+
+    /**
+     * 获取id号数据源
+     * */
+    public static DataSource getDataSource(Integer id) {
+        SqlSessionFactory factory = sessionPools.getSqlSessionFactory(id);
+        return factory.getConfiguration().getEnvironment().getDataSource();
     }
 
     /**

@@ -7,9 +7,24 @@
     ##数据库Mapper信息管理
     ##数据库各信息查看
 
+
 【问题】
 1.静态资源访问
     访问路径没有补全项目虚拟目录
     目前解决方案：项目不写虚拟目录
 
 2.阿里数据源长时间断开问题
+
+3.阿里数据源获取非本地数据源连接卡住...
+    【DruidDataSource.java】
+    public DruidPooledConnection getConnection(long maxWaitMillis) throws SQLException {
+        this.init();
+        if(this.filters.size() > 0) {
+            FilterChainImpl filterChain = new FilterChainImpl(this);
+            return filterChain.dataSource_connect(this, maxWaitMillis); //此句卡住
+        } else {
+            return this.getConnectionDirect(maxWaitMillis);
+        }
+    }
+    【将多数据源生成还是改成mybaits自带连接池】
+4.oracle数据库检测语句问题  【SELECT 1 FROM DUAL】

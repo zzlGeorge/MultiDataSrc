@@ -41,6 +41,7 @@
         <!--<property name="maxActive" value="20"/>
         <property name="minIdle" value="0"/>-->
 
+        <property name="filters" value="stat"/>
         <!-- 最大并发连接数 -->
         <property name="maxActive" value="${maxActive}"/>
         <!-- 初始化连接数量 -->

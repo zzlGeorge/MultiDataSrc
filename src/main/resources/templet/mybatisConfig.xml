@@ -27,31 +27,33 @@
     <environments default="development">
         <environment id="development">
             <transactionManager type="jdbc"/>
-            <!--<dataSource type="POOLED">-->
-            <dataSource type="com.george.multidb.DruidDataSourceDefine">
-                <!--<property name="driver" value="#driver#"/>
-                <property name="url" value="#url#"/>
-                <property name="username" value="#username#"/>
-                <property name="password" value="#password#"/>
-
-                <property name="poolMaximumActiveConnections" value="15"/>
-                <property name="poolMaximumIdleConnections" value="5"/>
-                <property name="poolMaximumCheckoutTime" value="20000"/>
-                <property name="poolTimeToWait" value="10000"/>
-
-                <property name="poolPingQuery" value="SELECT 1"/>
-                <property name="poolPingEnabled" value="true"/>
-                <property name="poolPingConnectionsNotUsedFor" value="5"/>-->
-
+            <dataSource type="POOLED">
+            <!--<dataSource type="com.george.multidb.DruidDataSourceDefine">-->
                 <property name="driver" value="#driver#"/>
                 <property name="url" value="#url#"/>
                 <property name="username" value="#username#"/>
                 <property name="password" value="#password#"/>
-                <!--<property name="initialSize" value="0" />-->
-                <!--<property name="maxActive" value="20"/>
-                <property name="minIdle" value="0"/>-->
 
+                <property name="poolMaximumActiveConnections" value="${poolMaximumActiveConnections}"/>
+                <property name="poolMaximumIdleConnections" value="${poolMaximumIdleConnections}"/>
+                <property name="poolMaximumCheckoutTime" value="${poolMaximumCheckoutTime}"/>
+                <property name="poolTimeToWait" value="${poolTimeToWait}"/>
+
+                <property name="poolPingQuery" value="${poolPingQuery}"/>
+                <property name="poolPingEnabled" value="${poolPingEnabled}"/>
+                <property name="poolPingConnectionsNotUsedFor" value="${poolPingConnectionsNotUsedFor}"/>
+
+                <!--<property name="driver" value="#driver#"/>
+                <property name="url" value="#url#"/>
+                <property name="username" value="#username#"/>
+                <property name="password" value="#password#"/>
+                &lt;!&ndash;<property name="initialSize" value="0" />
+                <property name="maxActive" value="20"/>
+                <property name="minIdle" value="0"/>&ndash;&gt;
+
+                <property name="filters" value="stat"/>
                 <property name="maxActive" value="${maxActive}"/>
+
                 <property name="initialSize" value="${initialSize}"/>
                 <property name="maxWait" value="${maxWait}"/>
                 <property name="minIdle" value="${minIdle}"/>
@@ -64,7 +66,7 @@
                 <property name="maxOpenPreparedStatements" value="${maxOpenPreparedStatements}"/>
                 <property name="removeAbandoned" value="${removeAbandoned}"/>
                 <property name="removeAbandonedTimeout" value="${removeAbandonedTimeout}"/>
-                <property name="logAbandoned" value="${logAbandoned}"/>
+                <property name="logAbandoned" value="${logAbandoned}"/>-->
             </dataSource>
         </environment>
     </environments>

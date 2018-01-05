@@ -33,6 +33,9 @@ public class SqlSessionPools implements ISqlSessionPools {
     public static final int SESSION_INIT_NUM = 5;//每个连接的连接数量配置
     private static final int PURSE_TIME = 1000;//停顿时间
 
+    //存放session工厂
+    private static Map<Integer, SqlSessionFactory> sessionFactories = new HashMap<Integer, SqlSessionFactory>();
+
     //存放&读取session容器
     private static Map<Integer, LinkedList<SqlSession>> sessionPools = new HashMap<Integer, LinkedList<SqlSession>>();
 
@@ -56,6 +59,32 @@ public class SqlSessionPools implements ISqlSessionPools {
             return;
         }
         getPools().put(id, (LinkedList<SqlSession>) sqlSessions);
+    }
+
+    /**
+     * 创建本地池
+     * 注意 ！ 本地池定义为 0  号池
+     */
+    public void createLocalPool() {
+        LinkedList<SqlSession> localSessions = SqlSessionHelper.getPools().get(0);
+        if (localSessions != null && localSessions.size() > 0) {
+            for (int i = 0; i < localSessions.size(); i++) {//关闭本地池
+                localSessions.get(i).close();
+            }
+        }
+        buildFactory(0, null, null);
+        SqlSessionFactory sessionFactory = getSqlSessionFactory(0);
+        LinkedList<SqlSession> sessions = new LinkedList<SqlSession>();
+        for (int i = 0; i < SqlSessionPools.SESSION_INIT_NUM; i++) {
+//            SqlSession session = sessionFactory.openSession();   //默认手动提交
+            SqlSession session = sessionFactory.openSession(true);//自动提交
+            if (session == null) {
+                throw new RuntimeException("无法获取本地sqlsession对象！");
+            }
+            sessions.add(session);
+        }
+        //将本地池也加入   【0】号池为本地池
+        SqlSessionHelper.getPools().put(0, sessions);
     }
 
 
@@ -108,32 +137,32 @@ public class SqlSessionPools implements ISqlSessionPools {
         }
     }
 
-    public synchronized List<SqlSession> buildSqlSession(Map<String, String> connInfo, Map<String, String> mapperInfo, Integer quantity) {
-        List<SqlSession> sqlSessions = new LinkedList<SqlSession>();
-        String templateContent = templateContentFinal;
-
-        if (connInfo != null && connInfo.size() != 0 /*&& mapperInfo.size() > 0*/) {
-            templateContent = templateContent.replaceAll("#driver#", connInfo.get("driver"));
-            templateContent = templateContent.replaceAll("#url#", connInfo.get("url"));
-            templateContent = templateContent.replaceAll("#username#", connInfo.get("username"));
-            templateContent = templateContent.replaceAll("#password#", connInfo.get("password"));
-
-            StringBuilder mapperContent = new StringBuilder("");
-            Iterator iterator = mapperInfo.values().iterator();
-            while (iterator.hasNext()) {
-                String content = iterator.next().toString();
-                String str = "<mapper resource=\"" + content + "\"/> \n";
-                mapperContent.append(str);
-            }
-            templateContent = templateContent.replaceAll("#mapper#", mapperContent.toString());
-        } else {
-            log.error("连接信息不正确或不能为空！");
-            throw new RuntimeException("连接信息不正确或不能为空！");
+    public SqlSessionFactory getSqlSessionFactory(Integer id) {
+        if (id == null) return null;
+        SqlSessionFactory factory = getSessionFactories().get(id);
+        if (factory == null) {
+            buildFactory(id, DBSrcInfoHelper.getInstance().getDBSrcConnDetail(id),
+                    DBSrcInfoHelper.getInstance().getDBSrcMapperById(id));//创建工厂
+            factory = getSessionFactories().get(id);
         }
-        InputStream is = new ByteArrayInputStream(templateContent.getBytes());
-        SqlSessionFactory sessionFactory = new SqlSessionFactoryBuilder()
-                .build(is);
-//        sqlSession = sessionFactory.openSession();
+        return factory;
+    }
+
+    /**
+     * 获得sqlsession
+     * mapperInfo结构为[(随意)，mapper[完整路径]
+     *
+     * @param connInfo   连接信息
+     * @param mapperInfo mapper信息
+     * @Param id 数据库id
+     */
+    private synchronized List<SqlSession> buildSqlSession(Integer id, Map<String, String> connInfo,
+                                                          Map<String, String> mapperInfo, Integer quantity) {
+        List<SqlSession> sqlSessions = new LinkedList<SqlSession>();
+        if (sessionFactories.get(id) == null) {
+            buildFactory(id, connInfo, mapperInfo);
+        }
+        SqlSessionFactory sessionFactory = sessionFactories.get(id);
         for (int i = 0; i < quantity; i++) {
             SqlSession sqlSession = sessionFactory.openSession(true);
             sqlSessions.add(sqlSession);
@@ -141,12 +170,48 @@ public class SqlSessionPools implements ISqlSessionPools {
         return sqlSessions;
     }
 
+    private synchronized void buildFactory(Integer id, Map<String, String> connInfo,
+                                           Map<String, String> mapperInfo) {
+
+        SqlSessionFactory sessionFactory;
+        if (id == 0) {//本地创建
+            String resource = "mybatis-config-local.xml";
+            InputStream is = SqlSessionPools.class.getClassLoader().getResourceAsStream(resource);
+            sessionFactory = new SqlSessionFactoryBuilder().build(is);
+        } else {
+            String templateContent = templateContentFinal;
+
+            if (connInfo != null && connInfo.size() != 0 /*&& mapperInfo.size() > 0*/) {
+                templateContent = templateContent.replaceAll("#driver#", connInfo.get("driver"));
+                templateContent = templateContent.replaceAll("#url#", connInfo.get("url"));
+                templateContent = templateContent.replaceAll("#username#", connInfo.get("username"));
+                templateContent = templateContent.replaceAll("#password#", connInfo.get("password"));
+
+                StringBuilder mapperContent = new StringBuilder("");
+                Iterator iterator = mapperInfo.values().iterator();
+                while (iterator.hasNext()) {
+                    String content = iterator.next().toString();
+                    String str = "<mapper resource=\"" + content + "\"/> \n";
+                    mapperContent.append(str);
+                }
+                templateContent = templateContent.replaceAll("#mapper#", mapperContent.toString());
+            } else {
+                log.error("连接信息不正确或不能为空！");
+                throw new RuntimeException("连接信息不正确或不能为空！");
+            }
+            InputStream is = new ByteArrayInputStream(templateContent.getBytes());
+            sessionFactory = new SqlSessionFactoryBuilder()
+                    .build(is);
+        }
+        sessionFactories.put(id, sessionFactory);//存放session工厂
+    }
+
     public List<SqlSession> getSessionBySrcId(Integer id) {
         List<SqlSession> sessions = null;
         Map<String, String> connMap;
         try {
             connMap = DBSrcInfoHelper.getInstance().getDBSrcConnDetail(id);
-            sessions = buildSqlSession(connMap, DBSrcInfoHelper.getInstance().getDBSrcMapperById(id), SESSION_INIT_NUM);
+            sessions = buildSqlSession(id, connMap, DBSrcInfoHelper.getInstance().getDBSrcMapperById(id), SESSION_INIT_NUM);
         } catch (Exception e) {
             log.error(e.toString());
             e.printStackTrace();
@@ -162,6 +227,10 @@ public class SqlSessionPools implements ISqlSessionPools {
 
     public Map<Integer, LinkedList<SqlSession>> getPools() {
         return sessionPools;
+    }
+
+    public Map<Integer, SqlSessionFactory> getSessionFactories() {
+        return sessionFactories;
     }
 
 
@@ -183,33 +252,5 @@ public class SqlSessionPools implements ISqlSessionPools {
             }
         }
         return true;
-    }
-
-    /**
-     * 创建本地池
-     * 注意 ！ 本地池定义为 0  号池
-     */
-    public void createLocalPool() {
-        LinkedList<SqlSession> localSessions = SqlSessionHelper.getPools().get(0);
-        if (localSessions != null && localSessions.size() > 0) {
-            for (int i = 0; i < localSessions.size(); i++) {//关闭本地池
-                localSessions.get(i).close();
-            }
-        }
-        String resource = "mybatis-config-local.xml";
-        InputStream is = SqlSessionPools.class.getClassLoader().getResourceAsStream(resource);
-        SqlSessionFactory sessionFactory = new SqlSessionFactoryBuilder().build(is);
-
-        LinkedList<SqlSession> sessions = new LinkedList<SqlSession>();
-        for (int i = 0; i < SqlSessionPools.SESSION_INIT_NUM; i++) {
-//            SqlSession session = sessionFactory.openSession();   //默认手动提交
-            SqlSession session = sessionFactory.openSession(true);//自动提交
-            if (session == null) {
-                throw new RuntimeException("无法获取本地sqlsession对象！");
-            }
-            sessions.add(session);
-        }
-        //将本地池也加入   【0】号池为本地池
-        SqlSessionHelper.getPools().put(0, sessions);
     }
 }

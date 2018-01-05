@@ -1,6 +1,7 @@
 package com.george.multidb;
 
 import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -18,11 +19,21 @@ public interface ISqlSessionPools {
     void createSessionPool(Integer id);
 
     /**
+     * 创建本地数据源
+     * */
+    void createLocalPool();
+
+    /**
      * 从id号连接池获取session(线程安全的)
      *
      * @param id 数据源id
      */
     SqlSession getSession(final Integer id);
+
+    /**
+     * 获取id号数据库的session工厂
+     * */
+    SqlSessionFactory getSqlSessionFactory(Integer id);
 
     /**
      * 通过id获取sessions
@@ -33,16 +44,9 @@ public interface ISqlSessionPools {
 
     boolean hasThePool(Integer id);
 
-    /**
-     * 获得sqlsession
-     * mapperInfo结构为[(随意)，mapper[完整路径]
-     *
-     * @param connInfo   连接信息
-     * @param mapperInfo mapper信息
-     */
-    List<SqlSession> buildSqlSession(Map<String, String> connInfo, Map<String, String> mapperInfo, Integer quantity);
-
     Map<Integer, LinkedList<SqlSession>> getPools();
+
+    Map<Integer,SqlSessionFactory> getSessionFactories();
 
     void closeSession(SqlSession session);
 

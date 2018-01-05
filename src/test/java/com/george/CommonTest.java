@@ -3,6 +3,7 @@ package com.george;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.george.dao.mappers.DBSrcMappersEntityMapper;
 import com.george.general.Constants;
+import com.george.multidb.Impl.SqlSessionPools;
 import com.george.multidb.SqlSessionHelper;
 import com.george.utils.jdbcUtils.JdbcDao;
 import com.george.utils.jdbcUtils.JdbcUtil;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.List;
 import java.util.Map;
@@ -19,16 +21,24 @@ import java.util.Map;
 /**
  * Created by George on 2017/12/12.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:spring-config/druid.xml")
+//@RunWith(SpringJUnit4ClassRunner.class)
+//@ContextConfiguration("classpath:spring-config/druid.xml")
 public class CommonTest {
 
-    @Autowired
-    private DruidDataSource druidDataSource;
+//    @Autowired
+//    private DruidDataSource druidDataSource;
+
     @Test
-    public void testCommon(){
-        try {
+    public void testCommon() {
+        /*try {
             druidDataSource.getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }*/
+        DataSource ds = SqlSessionHelper.getDataSource(2);
+        Connection conn;
+        try {
+            conn = ds.getConnection();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -37,12 +47,12 @@ public class CommonTest {
 
     @Test
     public void testGetConn() {
-        Connection connection = SqlSessionHelper.getPoolConn(2);
+        Connection connection = SqlSessionHelper.getConnectionFromDataSource(2);
 
         try {
             JdbcUtil jdbcUtil = new JdbcUtil();
-            List<Map<String, Object>> result = JdbcDao.findResult(jdbcUtil.getConnection(),
-                    "select id from db_src_info", null);
+            List<Map<String, Object>> result = JdbcDao.findResult(/*jdbcUtil.getConnection()*/connection,
+                    "SELECT top 10 * FROM BSINSTOCK", null);
             for (Map<String, Object> m : result) {
                 System.out.println(m);
             }
@@ -72,15 +82,15 @@ public class CommonTest {
 
     /**
      * Druid连接池测试
-     * */
+     */
     @Test
     public void testDruidPools() {
         //创建了一个实例
         DruidDataSource dataSource = new DruidDataSource();
         //设置数据库连接地址
-        dataSource.setUrl("jdbc:mysql://localhost:3306/multi_db");
-        dataSource.setUsername("root");
-        dataSource.setPassword("123456");
+        dataSource.setUrl("jdbc:sqlserver://192.168.20.164:1433;databaseName=MedicalSIMS001");
+        dataSource.setUsername("sa");
+        dataSource.setPassword("MK2017!");
         //设置初始化大小
         dataSource.setInitialSize(1);
         //设置在数据库连接词中的最小连接数
@@ -106,7 +116,7 @@ public class CommonTest {
 
         try {
             Connection connection = dataSource.getConnection();
-            PreparedStatement ps = connection.prepareStatement("select count(*) from db_src_info");
+            PreparedStatement ps = connection.prepareStatement("select 1");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 System.out.println(rs.getLong(1));

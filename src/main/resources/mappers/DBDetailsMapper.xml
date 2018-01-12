@@ -89,6 +89,9 @@
             <if test="entity.dbId != null">
                 AND id = #{entity.dbId}
             </if>
+            <if test="entity.ids != null">
+                AND id IN (${entity.ids})
+            </if>
             <if test="entity.srcName != null">
                 AND srcName = #{entity.srcName}
             </if>

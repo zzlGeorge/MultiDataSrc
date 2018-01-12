@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>并发性测试</title>
+
+    <!-- Bootstrap -->
+    <link href="/assets/plugins/bootstrap-3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/plugins/bootstrap-table/css/bootstrap-table.min.css:1">
+
+    <style>
+        * {
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+
+    <!--[if lt IE 9]>
+    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div>
+    <button onclick="callAjax(10)">执行</button>
+</div>
+<div id="content" style="margin-top: 15px"></div>
+<script src="/js/jquery/jquery.min.js"></script>
+<script src="/assets/plugins/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+<script>
+    var hospitals = [];
+    function callAjax(times) {
+        var html = "";
+        for (var t = 0; t < times; t++) {
+            $.ajax({
+                url: "/dbSrc/baseSrcInfo",
+                type: 'post',
+                dataType: 'json',
+                success: function (data) {
+                    var hsData = data.dataList;
+                    for (var j = 0; j < hsData.length; j++) {
+                        hospitals.push({
+                            id: hsData[j]["dbId"],
+                            text: hsData[j]["srcName"]
+                        });
+                    }
+                    for (var j = 0; j < hospitals.length; j++) {
+                        html += 'id = ' + hospitals[j]["id"] + ' text = ' + hospitals[j]["text"] + '****';
+                    }
+                    html += '<br>';
+                    $("#content").html(html);
+                    html = "";
+                },
+                error: function (e) {
+                    console.info(e);
+                }
+            });
+        }
+    }
+</script>
+</body>
+</html>

@@ -83,12 +83,15 @@
                         <li class="active"><a href="#" onclick="showSrc('/dbSrc/dbSrcView','数据库管理')"><i
                                 class="menu-icon icon-dashboard"></i>数据库管理
                         </a></li>
-                        <li><a href="#" onclick="showSrc('/dbSrc/dbSrcUrlView','数据库服务信息管理')"><i class="menu-icon icon-bullhorn"></i>数据库服务信息管理</a>
+                        <li><a href="#" onclick="showSrc('/dbSrc/dbSrcUrlView','数据库服务信息管理')"><i
+                                class="menu-icon icon-bullhorn"></i>数据库服务信息管理</a>
                         </li>
-                        <li><a href="#" onclick="showSrc()"><i class="menu-icon icon-inbox"></i>Inbox <b
+                        <li><a href="#" onclick="showSrc('/hello/safetyStockPage','数据源测试-库存物料查询')"><i
+                                class="menu-icon icon-inbox"></i>数据源测试-库存物料查询 <b
                                 class="label green pull-right">
                             11</b> </a></li>
-                        <li><a href="#" onclick="showSrc()"><i class="menu-icon icon-tasks"></i>Tasks <b
+                        <li><a href="#" onclick="showSrc('/dbSrc/dbMappersView','数据库Mapper信息管理')"><i
+                                class="menu-icon icon-tasks"></i>数据库Mapper信息管理 <b
                                 class="label orange pull-right">
                             19</b> </a></li>
                     </ul>
@@ -153,7 +156,7 @@
 
     function showSrc(url, title) {
         $('#innerContainer').attr('src', url);
-        $('.title').css('visibility','visible');
+        $('.title').css('visibility', 'visible');
         $('.titleTxt').html(title);
     }
 

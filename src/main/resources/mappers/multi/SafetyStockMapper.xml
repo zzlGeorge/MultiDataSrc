@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.george.dao.mappers.multi.SafetyStockMapper">
+
+    <sql id="baseColumns">
+        id,  safetyStock , stype , unit , largeUnit , stockSlowLimit , materialsName , specifications , materialsNum , storeroomPosition ,
+        materialsType, stockQuantity ,quantity,largeQuantity,batchNum
+    </sql>
+
+    <select id="getSafetyStockDataByEntity" parameterType="com.george.web.paramObject.SafetyStockParam"
+            resultType="com.george.dao.entities.multi.SafetyStock">
+        SELECT
+        id,
+        safetyStock,
+        stype,
+        unit,
+        largeUnit,
+        stockSlowLimit,
+        materialsName,
+        materialID,
+        specifications,
+        materialsNum,
+        storeroomPosition,
+        materialsType,
+        stockQuantity
+        /*expdate*/
+        /*quantity, 批号相关
+        largeQuantity,
+        batchNum*/
+        FROM
+        (
+        SELECT
+        row_number () OVER (ORDER BY a.storeroomPosition) AS id,
+        a.*, b.SAFENUM safetyStock,
+        b.LOWLIMITNUM stockSlowLimit,
+        c.stockQuantity
+        FROM
+        (
+        SELECT DISTINCT
+        BSSTOCKLOCATION.NAME storeroomPosition,
+        BSMATERIALTYPE.NAME materialsType,
+        BSMATERIAL.RI materialID, /*物料ID*/
+        BSMATERIAL.CODE materialsNum,
+        BSMATERIAL.NAME materialsName,
+        BSMATERIAL.SPEC specifications,
+        /*BSSTOCK.BATCH batchNum,*/
+        STU.NAME unit,
+        BU.NAME largeUnit,
+        /*BSSTOCK.BNUM largeQuantity,
+        BSSTOCK.SNUM quantity,*/
+        /*BSSTOCK.EXPDATE expdate,*/
+        BSMATERIAL.STYPE stype -- 1 自产 2集采
+        FROM
+        BSSTOCK
+        LEFT JOIN BSMATERIAL ON BSMATERIAL.RI = BSSTOCK.MRI
+        LEFT JOIN BSMATERIALTYPE ON BSMATERIALTYPE.RI = BSMATERIAL.TRI
+        LEFT JOIN BSSUPPLIER ON BSSUPPLIER.RI = BSMATERIAL.SPRI
+        LEFT JOIN BSSTOCKLOCATION ON BSSTOCKLOCATION.RI = BSSTOCK.SRI
+        LEFT JOIN BSUNIT BU ON BU.RI = BSSTOCK.BUNITRI
+        LEFT JOIN BSUNIT STU ON STU.RI = BSSTOCK.SUNITRI
+        WHERE
+        BSSTOCK.BNUM != 0
+        AND BSSTOCK.SNUM != 0
+        ) a --原视图
+        LEFT JOIN (
+        SELECT
+        a.PRI,
+        a.SAFENUM,
+        a.LOWLIMITNUM,
+        mt.CODE
+        FROM
+        BSREPLENISHLINE a
+        LEFT JOIN BSMATERIAL mt ON a.PRI = mt.RI
+        ) b ON a.materialsNum = b.CODE
+        LEFT JOIN (
+        -- 库存量视图
+        SELECT
+        e.materialsNum,
+        SUM (CAST(e.quantity AS INT)) stockQuantity
+        FROM
+        (
+        SELECT DISTINCT
+        -- row_number () OVER (ORDER BY BSSTOCK.RI) AS id,
+        BSSTOCKLOCATION.NAME storeroomPosition,
+        BSMATERIALTYPE.NAME materialsType,
+        BSMATERIAL.CODE materialsNum,
+        BSMATERIAL.NAME materialsName,
+        BSMATERIAL.SPEC specifications,
+        BSSTOCK.BATCH batchNum,
+        STU.NAME unit,
+        BU.NAME largeUnit,
+        BSSTOCK.BNUM largeQuantity,
+        BSSTOCK.SNUM quantity,
+        BSMATERIAL.STYPE stype -- 1 自产 2集采
+        FROM
+        BSSTOCK
+        LEFT JOIN BSMATERIAL ON BSMATERIAL.RI = BSSTOCK.MRI
+        LEFT JOIN BSMATERIALTYPE ON BSMATERIALTYPE.RI = BSMATERIAL.TRI
+        LEFT JOIN BSSUPPLIER ON BSSUPPLIER.RI = BSMATERIAL.SPRI
+        LEFT JOIN BSSTOCKLOCATION ON BSSTOCKLOCATION.RI = BSSTOCK.SRI
+        LEFT JOIN BSUNIT BU ON BU.RI = BSSTOCK.BUNITRI
+        LEFT JOIN BSUNIT STU ON STU.RI = BSSTOCK.SUNITRI
+        WHERE
+        BSSTOCK.BNUM != 0
+        AND BSSTOCK.SNUM != 0
+        ) e --视图
+        GROUP BY
+        e.materialsNum
+        ) c ON a.materialsNum = c.materialsNum
+        ) e
+        <where>
+            <if test="entity.goodsName != null">
+                AND materialsName LIKE '%${entity.goodsName}%'
+            </if>
+            <if test="entity.goodsType != null">
+                AND materialsType = #{entity.goodsType}
+            </if>
+            <if test="entity.materialNo != null">
+                AND materialsNum LIKE '%${entity.materialNo}%'
+            </if>
+            <if test="entity.position != null">
+                AND storeroomPosition LIKE '%${entity.position}%'
+            </if>
+            <if test="entity.goodsFrom != null">
+                AND stype = #{entity.goodsFrom}
+            </if>
+            <if test="entity.stockQuantity == 1">
+                AND stockQuantity &lt; stockSlowLimit
+            </if>
+            <if test="entity.stockQuantity == 2">
+                AND stockQuantity &gt; safetyStock
+            </if>
+        </where>
+    </select>
+
+    <select id="getSafetyStockData" resultType="com.george.dao.entities.multi.SafetyStock">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM (
+        SELECT
+        row_number () OVER (ORDER BY a.storeroomPosition) AS id,
+        a.*, b.SAFENUM safetyStock,
+        b.LOWLIMITNUM stockSlowLimit
+        FROM
+        (
+        SELECT DISTINCT
+        BSSTOCKLOCATION.NAME storeroomPosition,
+        BSMATERIALTYPE.NAME materialsType,
+        BSMATERIAL.CODE materialsNum,
+        BSMATERIAL.NAME materialsName,
+        BSMATERIAL.SPEC specifications,
+        BSSTOCK.BATCH batchNum,
+        STU.NAME unit,
+        BU.NAME largeUnit,
+        BSSTOCK.BNUM largeQuantity,
+        BSSTOCK.SNUM quantity,
+        BSMATERIAL.STYPE stype -- 1 自产 2集采
+        FROM
+        BSSTOCK
+        LEFT JOIN BSMATERIAL ON BSMATERIAL.RI = BSSTOCK.MRI
+        LEFT JOIN BSMATERIALTYPE ON BSMATERIALTYPE.RI = BSMATERIAL.TRI
+        LEFT JOIN BSSUPPLIER ON BSSUPPLIER.RI = BSMATERIAL.SPRI
+        LEFT JOIN BSSTOCKLOCATION ON BSSTOCKLOCATION.RI = BSSTOCK.SRI
+        LEFT JOIN BSUNIT BU ON BU.RI = BSSTOCK.BUNITRI
+        LEFT JOIN BSUNIT STU ON STU.RI = BSSTOCK.SUNITRI
+        WHERE
+        BSSTOCK.BNUM != 0
+        AND BSSTOCK.SNUM != 0
+        ) a --原视图
+        LEFT JOIN (
+        SELECT
+        a.PRI,
+        a.SAFENUM,
+        a.LOWLIMITNUM,
+        mt.CODE
+        FROM
+        BSREPLENISHLINE a
+        LEFT JOIN BSMATERIAL mt ON a.PRI = mt.RI
+        ) b ON a.materialsNum = b.CODE
+        )e
+    </select>
+
+</mapper>

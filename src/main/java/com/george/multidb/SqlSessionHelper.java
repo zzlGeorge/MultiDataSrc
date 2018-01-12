@@ -3,7 +3,9 @@ package com.george.multidb;
 import com.george.multidb.Impl.SqlSessionPools;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionManager;
 import org.apache.log4j.Logger;
+import org.mybatis.spring.SqlSessionTemplate;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -19,7 +21,7 @@ public class SqlSessionHelper {
     private static SqlSessionPools sessionPools = new SqlSessionPools();
 
     /**
-     * è·å–idå·æ•°æ®æºSqlSession
+     * »ñÈ¡idºÅÊı¾İÔ´SqlSession
      */
     public static SqlSession getSqlSession(Integer id) {
         return sessionPools.getSession(id);
@@ -27,26 +29,26 @@ public class SqlSessionHelper {
 
 
     /**
-     * è·å–idå·æ± çš„ä¸€ä¸ªè¿æ¥
+     * »ñÈ¡idºÅ³ØµÄÒ»¸öÁ¬½Ó
      *
-     * @param id æ•°æ®æºid
-     * @return è¯¥æ•°æ®æºä¸‹çš„ä¸€ä¸ªè¿æ¥
+     * @param id Êı¾İÔ´id
+     * @return ¸ÃÊı¾İÔ´ÏÂµÄÒ»¸öÁ¬½Ó
      */
     public static Connection getPoolConn(Integer id) {
         if (id == null) return null;
         SqlSession targetSession = getSqlSession(id);
         try {
-            targetSession = checkSqlSession(targetSession, id);//æ£€æŸ¥
+            targetSession = checkSqlSession(targetSession, id);//¼ì²é
         } catch (Exception e) {
             e.printStackTrace();
         }
         Connection resConn = targetSession.getConnection();
-        sessionPools.closeSession(targetSession);
+//        sessionPools.closeSession(targetSession);
         return resConn;
     }
 
     /**
-     * ä»æ•°æ®æºä¸­è·å–ä¸€ä¸ªæ•°æ®åº“è¿æ¥
+     * ´ÓÊı¾İÔ´ÖĞ»ñÈ¡Ò»¸öÊı¾İ¿âÁ¬½Ó
      */
     public static Connection getConnectionFromDataSource(Integer id) {
         SqlSessionFactory factory = sessionPools.getSqlSessionFactory(id);
@@ -60,18 +62,18 @@ public class SqlSessionHelper {
     }
 
     /**
-     * è·å–idå·æ•°æ®æº
-     * */
+     * »ñÈ¡idºÅÊı¾İÔ´
+     */
     public static DataSource getDataSource(Integer id) {
         SqlSessionFactory factory = sessionPools.getSqlSessionFactory(id);
         return factory.getConfiguration().getEnvironment().getDataSource();
     }
 
     /**
-     * é€šè¿‡ï¼ˆåŒ»é™¢ï¼‰idå’Œå·²åˆ›å»ºçš„Mapperè·å–Mapperå®ä¾‹
+     * Í¨¹ı£¨Ò½Ôº£©idºÍÒÑ´´½¨µÄMapper»ñÈ¡MapperÊµÀı
      *
-     * @param mapper     å·²åˆ›å»ºçš„Mapperæ¥å£
-     * @param hospitalId åŒ»é™¢id
+     * @param mapper     ÒÑ´´½¨µÄMapper½Ó¿Ú
+     * @param hospitalId Ò½Ôºid
      */
     public static <T> T getMapperInstance(Class<T> mapper, Integer hospitalId) {
         SqlSession session = null;
@@ -81,9 +83,12 @@ public class SqlSessionHelper {
             session = checkSqlSession(session, hospitalId);
             instance = session.getMapper(mapper);
         } catch (Exception e) {
-            e.printStackTrace();
+            String mapperTotalName = mapper.getName();
+            String result = hospitalId + "ºÅÊı¾İÔ´Ã»ÓĞÅäÖÃ" + mapperTotalName.
+                    substring(mapperTotalName.lastIndexOf(".") + 1, mapperTotalName.length()) + ".xmlÎÄ¼ş";
+            System.out.println(result);
         } finally {
-            sessionPools.closeSession(session);
+//            sessionPools.closeSession(session);
         }
         return instance;
     }
@@ -96,21 +101,26 @@ public class SqlSessionHelper {
         sessionPools.createSessionPool(id);
     }
 
-    public static Map<Integer, LinkedList<SqlSession>> getPools() {
+    /*public static Map<Integer, LinkedList<SqlSession>> getPools() {
+        return sessionPools.getPools();
+    }*/
+
+    public static Map<Integer, SqlSession> getPools() {
         return sessionPools.getPools();
     }
 
+
     /**
-     * æ£€æŸ¥sqlSession
+     * ¼ì²ésqlSession
      *
-     * @param session    éœ€æ£€æŸ¥çš„SqlSession
-     * @param hospitalId æ•°æ®æºid
+     * @param session    Ğè¼ì²éµÄSqlSession
+     * @param hospitalId Êı¾İÔ´id
      */
     private static SqlSession checkSqlSession(SqlSession session, Integer hospitalId) throws Exception {
         SqlSession resSession = session;
-        /*if (!resSession.getConnection().isValid(5)) { //å¦‚æœSQLSessionå¤±æ•ˆ
-            log.info(hospitalId + "å·æ± " + "å·²ç»å¤±æ•ˆï¼Œå¯åŠ¨åˆ·æ–°ï¼");
-            if (hospitalId == 0) {//æœ¬åœ°æ± åˆ›å»ºæ–¹å¼ä¸ä¸€æ ·
+        /*if (!resSession.getConnection().isValid(5)) { //Èç¹ûSQLSessionÊ§Ğ§
+            log.info(hospitalId + "ºÅ³Ø" + "ÒÑ¾­Ê§Ğ§£¬Æô¶¯Ë¢ĞÂ£¡");
+            if (hospitalId == 0) {//±¾µØ³Ø´´½¨·½Ê½²»Ò»Ñù
                 createLocalPool();
             } else {
                 sessionPools.createSessionPool(hospitalId);

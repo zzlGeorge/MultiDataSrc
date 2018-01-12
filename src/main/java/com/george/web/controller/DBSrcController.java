@@ -2,6 +2,7 @@ package com.george.web.controller;
 
 import com.george.dao.entities.DBDetailsEntity;
 import com.george.dao.entities.DBSrcInfoEntity;
+import com.george.dao.entities.DBSrcMappersEntity;
 import com.george.service.DatabaseSrcService;
 import com.george.utils.FilterData;
 import com.george.web.ParamObject;
@@ -29,6 +30,14 @@ public class DBSrcController {
     @RequestMapping(value = "/dbSrcView", method = RequestMethod.GET)
     public String dbSrcViewPage() {
         return "page/dbSrcView";
+    }
+
+    /**
+     * 数据源Mapper信息页面
+     */
+    @RequestMapping(value = "/dbMappersView", method = RequestMethod.GET)
+    public String dbMappersViewPage() {
+        return "page/mappersMgr/mappersMgr";
     }
 
     /**
@@ -101,7 +110,7 @@ public class DBSrcController {
 
     /**
      * 获取某个数据库的连接信息
-     * */
+     */
     @RequestMapping(value = "/getOneUrlInfo", method = RequestMethod.GET)
     @ResponseBody
     public Object getSrcUrlInfoGET(DBDetailsEntity entity) {
@@ -115,5 +124,41 @@ public class DBSrcController {
         ParamObject paramObject = new ParamObject();
         paramObject.setDataList(data);
         return paramObject;
+    }
+
+    /**
+     * 数据源mappers仓库信息查询
+     */
+    @RequestMapping(value = "/getSrcMappers", method = RequestMethod.GET)
+    @ResponseBody
+    public Object getSrcMappersGET(ParamObject param, DBSrcMappersEntity entity) {
+        return getSrcMappers(param, entity);
+    }
+
+    @RequestMapping(value = "/getSrcMappers", method = RequestMethod.POST)
+    @ResponseBody
+    public Object getSrcMappers(ParamObject param, DBSrcMappersEntity entity) {
+        List<DBSrcMappersEntity> data = databaseSrcService.getSrcMappersInfo(entity);
+        return FilterData.splitPage(param, data);
+    }
+
+
+    @RequestMapping(value = "/getMapperDbUser", method = RequestMethod.GET)
+    @ResponseBody
+    public Object getMapperDbUserGET(ParamObject param, Integer mapperId) {
+        return getMapperDbUser(param, mapperId);
+    }
+
+    @RequestMapping(value = "/getMapperDbUser", method = RequestMethod.POST)
+    @ResponseBody
+    public Object getMapperDbUser(ParamObject param, Integer mapperId) {
+        if (mapperId == null) {
+            param.setResult(false);
+            param.setMessage("mapperId未指定");
+            param.setCode(-1);
+            return param;
+        }
+        List<DBSrcInfoEntity> data = databaseSrcService.getMapperDbUser(mapperId);
+        return FilterData.splitPage(param, data);
     }
 }

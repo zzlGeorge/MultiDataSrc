@@ -8,6 +8,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.log4j.Logger;
+import org.mybatis.spring.SqlSessionTemplate;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -30,14 +31,11 @@ public class SqlSessionPools implements ISqlSessionPools {
     //模板字符串只读一次
     private static String templateContentFinal;
 
-    public static final int SESSION_INIT_NUM = 5;//每个连接的连接数量配置
-    private static final int PURSE_TIME = 1000;//停顿时间
-
     //存放session工厂
     private static Map<Integer, SqlSessionFactory> sessionFactories = new HashMap<Integer, SqlSessionFactory>();
 
     //存放&读取session容器
-    private static Map<Integer, LinkedList<SqlSession>> sessionPools = new HashMap<Integer, LinkedList<SqlSession>>();
+    private static Map<Integer, SqlSession> sessionPools = new HashMap<Integer, SqlSession>();
 
     static {
         String path = SqlSessionPools.class.getClassLoader().getResource(CONF_FILE_NAME).getPath().substring(1);
@@ -51,14 +49,14 @@ public class SqlSessionPools implements ISqlSessionPools {
     }
 
     public void createSessionPool(Integer id) {
-        closeSqlSessionPool(id);//先关闭池
-        List<SqlSession> sqlSessions;
+//        closeSqlSessionPool(id);//先关闭池
+        SqlSession sqlSessions;
         sqlSessions = getSessionBySrcId(id);
         if (sqlSessions == null) {
             log.error("创建失败!");
             return;
         }
-        getPools().put(id, (LinkedList<SqlSession>) sqlSessions);
+        getPools().put(id, sqlSessions);
     }
 
     /**
@@ -66,75 +64,19 @@ public class SqlSessionPools implements ISqlSessionPools {
      * 注意 ！ 本地池定义为 0  号池
      */
     public void createLocalPool() {
-        LinkedList<SqlSession> localSessions = SqlSessionHelper.getPools().get(0);
-        if (localSessions != null && localSessions.size() > 0) {
-            for (int i = 0; i < localSessions.size(); i++) {//关闭本地池
-                localSessions.get(i).close();
-            }
-        }
         buildFactory(0, null, null);
         SqlSessionFactory sessionFactory = getSqlSessionFactory(0);
-        LinkedList<SqlSession> sessions = new LinkedList<SqlSession>();
-        for (int i = 0; i < SqlSessionPools.SESSION_INIT_NUM; i++) {
-//            SqlSession session = sessionFactory.openSession();   //默认手动提交
-            SqlSession session = sessionFactory.openSession(true);//自动提交
-            if (session == null) {
-                throw new RuntimeException("无法获取本地sqlsession对象！");
-            }
-            sessions.add(session);
-        }
+        SqlSession sqlSession = new SqlSessionTemplate(sessionFactory);
         //将本地池也加入   【0】号池为本地池
-        SqlSessionHelper.getPools().put(0, sessions);
+        getPools().put(0, sqlSession);
     }
 
+    public SqlSession getSession(Integer id) {
+        if (getPools().get(id) == null)
+            createSessionPool(id);
 
-    public synchronized SqlSession getSession(final Integer id) {
-        //判断有没有这个连接池
-        synchronized (this) {
-            if (!hasThePool(id)) {//...........不加锁可能创建多个池
-                if (id == 0)//本地库创建方式
-                    createLocalPool();
-                else
-                    createSessionPool(id);
-            }
-        }
-//        createSessionPool(id);
-        //获取id号连接池
-        final LinkedList<SqlSession> sessionPool = getPools().get(id);
-
-        synchronized (this) {//同步取session
-            while (sessionPool.size() == 0) {
-                try {
-                    System.out.println(Thread.currentThread().getName() + ": " + "----------------等待" + id + "号sqlSessions数据库连接池-------------");
-                    Thread.sleep(PURSE_TIME);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (sessionPool.size() > 0) {//池内连接还有
-                final SqlSession session = sessionPool.removeFirst();
-//                System.out.println(Thread.currentThread().getName() + ": " + id + "号sqlSessions连接池【取出】，现在大小是" + sessionPool.size());
-                //返回SqlSession对象的代理对象
-                return (SqlSession) Proxy.newProxyInstance(SqlSessionPools.class.getClassLoader(), session.getClass().getInterfaces(), new InvocationHandler() {
-                    public Object invoke(Object proxy, Method method, Object[] args)
-                            throws Throwable {
-                        synchronized (sessionPool) {//同步将session放回池中
-                            if (!method.getName().equals("close")) {
-                                return method.invoke(session, args);
-                            } else {
-                                //如果调用的是SqlSession对象的close方法，就把session还给数据库连接池
-                                sessionPool.add(session);
-//                                System.out.println(Thread.currentThread().getName() + ": " + id + "号sqlSessions连接池【放回】，现在大小为" + sessionPool.size());
-                                return null;
-                            }
-                        }
-                    }
-                });
-            } else {//池内连接没有
-                throw new RuntimeException("对不起，数据库忙");
-            }
-        }
+        return getPools().get(id);//spring 中包裹的SqlSession类，线程安全
+//        return SqlSessionManager.newInstance(sessionPools.getSqlSessionFactory(id));
     }
 
     public SqlSessionFactory getSqlSessionFactory(Integer id) {
@@ -156,18 +98,15 @@ public class SqlSessionPools implements ISqlSessionPools {
      * @param mapperInfo mapper信息
      * @Param id 数据库id
      */
-    private synchronized List<SqlSession> buildSqlSession(Integer id, Map<String, String> connInfo,
-                                                          Map<String, String> mapperInfo, Integer quantity) {
-        List<SqlSession> sqlSessions = new LinkedList<SqlSession>();
+    private synchronized SqlSession buildSqlSession(Integer id, Map<String, String> connInfo,
+                                                    Map<String, String> mapperInfo) {
+        SqlSession sqlSession;
         if (sessionFactories.get(id) == null) {
             buildFactory(id, connInfo, mapperInfo);
         }
         SqlSessionFactory sessionFactory = sessionFactories.get(id);
-        for (int i = 0; i < quantity; i++) {
-            SqlSession sqlSession = sessionFactory.openSession(true);
-            sqlSessions.add(sqlSession);
-        }
-        return sqlSessions;
+        sqlSession = new SqlSessionTemplate(sessionFactory);
+        return sqlSession;
     }
 
     private synchronized void buildFactory(Integer id, Map<String, String> connInfo,
@@ -206,17 +145,17 @@ public class SqlSessionPools implements ISqlSessionPools {
         sessionFactories.put(id, sessionFactory);//存放session工厂
     }
 
-    public List<SqlSession> getSessionBySrcId(Integer id) {
-        List<SqlSession> sessions = null;
+    public SqlSession getSessionBySrcId(Integer id) {
+        SqlSession sqlSession = null;
         Map<String, String> connMap;
         try {
             connMap = DBSrcInfoHelper.getInstance().getDBSrcConnDetail(id);
-            sessions = buildSqlSession(id, connMap, DBSrcInfoHelper.getInstance().getDBSrcMapperById(id), SESSION_INIT_NUM);
+            sqlSession = buildSqlSession(id, connMap, DBSrcInfoHelper.getInstance().getDBSrcMapperById(id));
         } catch (Exception e) {
             log.error(e.toString());
             e.printStackTrace();
         }
-        return sessions;
+        return sqlSession;
     }
 
     public boolean hasThePool(Integer id) {
@@ -225,7 +164,7 @@ public class SqlSessionPools implements ISqlSessionPools {
         return true;
     }
 
-    public Map<Integer, LinkedList<SqlSession>> getPools() {
+    public Map<Integer, SqlSession> getPools() {
         return sessionPools;
     }
 
@@ -233,24 +172,21 @@ public class SqlSessionPools implements ISqlSessionPools {
         return sessionFactories;
     }
 
-
-    public void closeSession(SqlSession session) {
-        if (session != null) {
-            try {
-                session.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public boolean closeSqlSessionPool(Integer id) {
-        LinkedList<SqlSession> sessions = getPools().get(id);
-        if (sessions != null && sessions.size() > 0) {
-            for (int i = 0; i < sessions.size(); i++) {
-                sessions.get(i).close();
-            }
-        }
-        return true;
-    }
+//    public void closeSession(SqlSession session) {
+//        if (session != null) {
+//            try {
+//                session.close();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
+//
+//    public boolean closeSqlSessionPool(Integer id) {
+//        SqlSession sessions = getPools().get(id);
+//        if (sessions != null) {
+//            sessions.close();
+//        }
+//        return true;
+//    }
 }

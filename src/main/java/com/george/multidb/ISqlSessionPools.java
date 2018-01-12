@@ -40,15 +40,17 @@ public interface ISqlSessionPools {
      *
      * @param id 数据源id
      */
-    List<SqlSession> getSessionBySrcId(Integer id);
+//    List<SqlSession> getSessionBySrcId(Integer id);
+    SqlSession getSessionBySrcId(Integer id);
 
     boolean hasThePool(Integer id);
 
-    Map<Integer, LinkedList<SqlSession>> getPools();
+//    Map<Integer, LinkedList<SqlSession>> getPools();
+    Map<Integer, SqlSession> getPools();
 
     Map<Integer,SqlSessionFactory> getSessionFactories();
 
-    void closeSession(SqlSession session);
-
-    boolean closeSqlSessionPool(Integer id);
+//    void closeSession(SqlSession session);
+//
+//    boolean closeSqlSessionPool(Integer id);
 }

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>数据库Mapper信息管理</title>
+
+    <!-- Bootstrap -->
+    <link href="/assets/plugins/bootstrap-3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/plugins/bootstrap-table/css/bootstrap-table.min.css">
+
+    <style>
+        .wrapper {
+            padding: 20px 15px
+        }
+
+        .wrapper .search {
+            padding: 5px 5px;
+        }
+
+        .wrapper .content {
+
+        }
+
+        .wrapper .search .form-group .form-control {
+            display: inline-block;
+        }
+
+        #dbSrc {
+            width: 180px;
+        }
+
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0);
+        }
+    </style>
+
+    <!--[if lt IE 9]>
+    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="wrapper">
+    <div class="search">
+        <div class="form-group">
+            <label for="dbSrc">数据源：</label>
+            <select id="dbSrc" class="form-control">
+                <option value="">全部</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="tableContent">
+            <table id="dbMappersTb"></table>
+        </div>
+    </div>
+</div>
+
+<script src="/js/jquery/jquery.min.js"></script>
+<script src="/assets/plugins/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+<script src="/assets/plugins/bootstrap-table/js/bootstrap.min.js"></script>
+<script src="/assets/plugins/bootstrap-table/js/bootstrap-table.js"></script>
+<script src="/assets/plugins/bootstrap-table/js/bootstrap-table-zh-CN.js"></script>
+<script src="/js/common.js"></script>
+
+<script>
+    var cols = [
+        {field: 'id', title: '序号'},
+        {field: 'relativePath', title: '相对路径'},
+        {field: 'mapperName', title: '文件名'},
+        {
+            field: 'status', title: '状态',
+            formatter: function (value, row, index) {
+                if (value === 1)
+                    return '启用';
+                else if (value === 0)
+                    return '停用';
+            }
+        },
+        {
+            field: 'updateTime', title: '更新时间',
+            formatter: function (value, row, index) {
+                return timeStampToDateString(value, 'yyyy-MM-dd h:m:s');
+            }
+        },
+        {field: 'remarks', title: '备注'},
+        {
+            field: '', title: '操作',
+            formatter: function (value, row, index) {
+                return '<a style="cursor: pointer" onclick="viewDbUser(' + row["id"] + ')">查看使用者</a>';
+            }
+        }
+    ];
+
+    $(function () {
+        initSrcNames('#dbSrc');
+        initTableServer('#dbMappersTb', cols, '/dbSrc/getSrcMappers', searchParams);
+    });
+
+    function searchParams(params) {
+        params["pageSize"] = params.limit;
+        params["pageNumber"] = params.offset / params.limit + 1;
+        return params;
+    }
+
+    function viewDbUser(mapperId) {
+        var contentHtml = '<div class="content">' +
+            '        <div class="tableContent">' +
+            '            <table id="cellTb"></table>' +
+            '        </div>' +
+            '    </div>';
+        showMode(contentHtml);
+        var params = function (params) {
+            params["pageSize"] = params.limit;
+            params["pageNumber"] = params.offset / params.limit + 1;
+            params['mapperId'] = mapperId;
+            return params;
+        };
+        var cellCols = [
+            {field: 'dbId', title: '数据源ID'},
+            {field: 'srcName', title: '名称'},
+            {field: 'srcDbName', title: '数据库名'},
+            {
+                field: 'type', title: '类型',
+                formatter: function (value, row, index) {
+                    var type = '';
+                    switch (value) {
+                        case 1:
+                            type = 'MySql';
+                            break;
+                        case 2:
+                            type = 'SqlServer';
+                            break;
+                        case 3:
+                            type = 'Oracle';
+                            break;
+                        default:
+                            break;
+                    }
+                    return type;
+                }
+            },
+            {
+                field: 'status', title: '状态',
+                formatter: function (value, row, index) {
+                    if (value == 1)
+                        return '启用';
+                    else if (value == 0)
+                        return '停用';
+                }
+            }
+        ];
+        initTableServer('#cellTb', cellCols, '/dbSrc/getMapperDbUser', params);
+    }
+
+    function showMode(content) {
+        $('#contentBody').html(content);
+        $('#my-modal-alert').modal('toggle');
+    }
+</script>
+
+<!-- bootstrap模糊框 -->
+<div class="modal fade" id="my-modal-alert">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times</span><span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="modal-title">模态框</h4><span id="num"></span>
+            </div>
+            <div class="modal-body" id="contentBody">
+                内容
+            </div>
+            <div class="modal-footer" id="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

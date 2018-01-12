@@ -51,7 +51,6 @@
                 AND relativePath = #{entity.relativePath}
             </if>
         </where>
-        <include refid="com.george.utils.generators.mybatis.mapper.CRUDMapper.orderBy"/>
     </select>
 
     <select id="criteriaSearch" resultType="com.george.dao.entities.DBSrcMappersEntity">

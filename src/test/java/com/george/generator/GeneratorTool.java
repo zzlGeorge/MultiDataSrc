@@ -42,10 +42,10 @@ public class GeneratorTool {
      */
     @Test
     public void generateJavaBeanFromDB() {
-        Connection connection = SqlSessionHelper.getPoolConn(3);//指定数据库连接
+        Connection connection = SqlSessionHelper.getConnectionFromDataSource(0);//指定数据库连接
         try {
             boolean res = BeanProcess.generateJavaBeanFromDB(Constants.ROOT_PATH + "/src/main/java", "com.george.dao.entities",
-                    connection, "VALIDITYWARNING", "ValidityWarning");//生成javabean文件于指定位置
+                    connection, "src_mappers", "DBMappers");//生成javabean文件于指定位置
             connection.close();
         } catch (SQLException e) {
             e.printStackTrace();

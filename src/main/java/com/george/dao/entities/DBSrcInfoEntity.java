@@ -14,6 +14,9 @@ public class DBSrcInfoEntity {
     private Integer status;    //状态；1：启用  0：不启用
     private Date updateTime;
 
+    //另加
+    private String ids; //id集合
+
     public Integer getDbId() {
         return dbId;
     }
@@ -70,4 +73,11 @@ public class DBSrcInfoEntity {
         this.updateTime = updateTime;
     }
 
+    public String getIds() {
+        return ids;
+    }
+
+    public void setIds(String ids) {
+        this.ids = ids;
+    }
 }

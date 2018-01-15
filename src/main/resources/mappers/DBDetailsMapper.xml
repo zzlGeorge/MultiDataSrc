@@ -3,7 +3,7 @@
 <mapper namespace="com.george.dao.mappers.DBDetailsMapper">
 
     <sql id="baseColumns">
-        id,  url , userName , driverName , updateTime , password
+        id,  url , userName , driverName , updateTime , password, `status`, deleteFlag
     </sql>
 
     <resultMap id="dbSrcInfoMap" type="com.george.dao.entities.DBDetailsEntity">
@@ -13,6 +13,8 @@
         <result property="userName" column="userName"/>
         <result property="password" column="password"/>
         <result property="updateTime" column="updateTime"/>
+        <result property="status" column="status"/>
+        <result property="deleteFlag" column="deleteFlag"/>
         <collection property="dataBases" ofType="com.george.dao.entities.DBSrcInfoEntity">
             <id property="dbId" column="dbId"/>
             <result property="srcName" column="srcName"/>
@@ -21,6 +23,7 @@
             <result property="status" column="status"/>
             <result property="type" column="type"/>
             <result property="updateTime" column="updateTime"/>
+            <result property="deleteFlag" column="deleteFlag"/>
         </collection>
     </resultMap>
 
@@ -36,11 +39,12 @@
         <include refid="baseColumns"/>
         FROM db_details
         <where>
+            deleteFlag = 0
             <if test="entity.id != null">
-                id = #{entity.id}
+                AND id = #{entity.id}
             </if>
             <if test="entity.url != null">
-                url = #{entity.url}
+                AND url = #{entity.url}
             </if>
             <if test="entity.userName != null">
                 AND userName = #{entity.userName}
@@ -53,6 +57,12 @@
             </if>
             <if test="entity.password != null">
                 AND password = #{entity.password}
+            </if>
+            <if test="entity.status != null">
+                AND `status` = #{entity.status}
+            </if>
+            <if test="entity.deleteFlag != null">
+                AND deleteFlag = #{entity.deleteFlag}
             </if>
         </where>
     </select>
@@ -70,7 +80,7 @@
         FROM
             db_details dt
         LEFT JOIN db_src_info srcinf ON srcinf.srcUrlId = dt.id
-        WHERE srcinf.status = 1
+        WHERE srcinf.status = 1 AND srcinf.deleteFlag = 0
     </select>
 
     <select id="getSrcInfo" parameterType="com.george.dao.entities.DBSrcInfoEntity"
@@ -85,7 +95,7 @@
         updateTime
         FROM db_src_info
         <where>
-            1=1
+            deleteFlag = 0
             <if test="entity.dbId != null">
                 AND id = #{entity.dbId}
             </if>

@@ -1,0 +1,38 @@
+.wrapper {
+    padding: 20px 15px
+}
+
+.wrapper .search {
+    padding: 5px 5px;
+}
+
+.wrapper .content {
+
+}
+
+.wrapper .search .form-group .form-control {
+    display: inline-block;
+}
+
+#dbSrc {
+    width: 180px;
+}
+
+.modal-backdrop {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.btn-default {
+    color: #333;
+    background-color: #ffffff;
+    border-color: #ccc;
+    float: right;
+}
+
+.btn-danger {
+    color: #fff;
+    background-color: #d9534f;
+    border-color: #d43f3a;
+    float: right;
+    margin-right: 7px;
+}

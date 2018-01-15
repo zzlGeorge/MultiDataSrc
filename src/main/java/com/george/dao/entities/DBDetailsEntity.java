@@ -13,6 +13,8 @@ public class DBDetailsEntity {
     private String userName;
     private String password;
     private Date updateTime;
+    private Integer status;    //状态；1：启用  0：不启用
+    private Integer deleteFlag; //删除标记
     private List<DBSrcInfoEntity> dataBases;//子表
 
     public Integer getId() {
@@ -69,5 +71,21 @@ public class DBDetailsEntity {
 
     public void setDataBases(List<DBSrcInfoEntity> dataBases) {
         this.dataBases = dataBases;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Integer getDeleteFlag() {
+        return deleteFlag;
+    }
+
+    public void setDeleteFlag(Integer deleteFlag) {
+        this.deleteFlag = deleteFlag;
     }
 }

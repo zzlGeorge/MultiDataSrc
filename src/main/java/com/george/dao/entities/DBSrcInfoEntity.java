@@ -13,6 +13,7 @@ public class DBSrcInfoEntity {
     private Integer type;    //类型
     private Integer status;    //状态；1：启用  0：不启用
     private Date updateTime;
+    private Integer deleteFlag;
 
     //另加
     private String ids; //id集合
@@ -79,5 +80,13 @@ public class DBSrcInfoEntity {
 
     public void setIds(String ids) {
         this.ids = ids;
+    }
+
+    public Integer getDeleteFlag() {
+        return deleteFlag;
+    }
+
+    public void setDeleteFlag(Integer deleteFlag) {
+        this.deleteFlag = deleteFlag;
     }
 }

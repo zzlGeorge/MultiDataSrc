@@ -9,32 +9,7 @@
     <!-- Bootstrap -->
     <link href="/assets/plugins/bootstrap-3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/assets/plugins/bootstrap-table/css/bootstrap-table.min.css">
-
-    <style>
-        .wrapper {
-            padding: 20px 15px
-        }
-
-        .wrapper .search {
-            padding: 5px 5px;
-        }
-
-        .wrapper .content {
-
-        }
-
-        .wrapper .search .form-group .form-control {
-            display: inline-block;
-        }
-
-        #dbSrc {
-            width: 180px;
-        }
-
-        .modal-backdrop {
-            background-color: rgba(0, 0, 0, 0);
-        }
-    </style>
+    <link rel="stylesheet" href="/css/childPage.css">
 
     <!--[if lt IE 9]>
     <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -49,6 +24,9 @@
             <select id="dbSrc" class="form-control">
                 <option value="">全部</option>
             </select>
+
+            <button class="btn btn-default">添加数据库</button>
+            <button class="btn btn-danger">删除数据库</button>
         </div>
     </div>
 
@@ -68,10 +46,12 @@
 
 <script>
     var cols = [
-        {field: 'dbId', title: '数据源ID'},
-        {field: 'srcName', title: '名称'},
-        {field: 'srcDbName', title: '数据库名'},
+        {checkbox: true},
+        {align: 'center', field: 'dbId', title: '数据源ID'},
+        {align: 'center', field: 'srcName', title: '名称'},
+        {align: 'center', field: 'srcDbName', title: '数据库名'},
         {
+            align: 'center',
             field: 'type', title: '类型',
             formatter: function (value, row, index) {
                 var type = '';
@@ -92,24 +72,28 @@
             }
         },
         {
+            align: 'center',
             field: 'status', title: '状态',
             formatter: function (value, row, index) {
-                if (value == 1)
+                if (value === 1)
                     return '启用';
-                else if (value == 0)
+                else if (value === 0)
                     return '停用';
             }
         },
         {
+            align: 'center',
             field: 'updateTime', title: '更新时间',
             formatter: function (value, row, index) {
                 return timeStampToDateString(value, 'yyyy-MM-dd h:m:s');
             }
         },
         {
+            align: 'center',
             field: '', title: '操作',
             formatter: function (value, row, index) {
                 var html = '<a style="cursor: pointer" onclick="viewUrlDetails(' + row["srcUrlId"] + ')">查看连接信息</a>';
+                html += '&nbsp;&nbsp;<a style="cursor: pointer" onclick="">修改</a>';
                 return html;
             }
         }

@@ -10,27 +10,7 @@
     <link href="/assets/plugins/bootstrap-3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/assets/plugins/bootstrap-table/css/bootstrap-table.min.css">
 
-    <style>
-        .wrapper {
-            padding: 20px 15px
-        }
-
-        .wrapper .search {
-            padding: 5px 5px;
-        }
-
-        .wrapper .content {
-
-        }
-
-        .wrapper .search .form-group .form-control {
-            display: inline-block;
-        }
-
-        #dbSrc {
-            width: 180px;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/childPage.css">
 
     <!--[if lt IE 9]>
     <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -45,6 +25,8 @@
             <select id="dbSrc" class="form-control">
                 <option value="">全部</option>
             </select>
+            <button class="btn btn-default">添加数据库</button>
+            <button class="btn btn-danger">删除数据库</button>
         </div>
     </div>
 
@@ -64,8 +46,9 @@
 
 <script>
     var cols = [
-        {field: 'id', title: '序号'},
+        {align: 'center', field: 'id', title: '序号'},
         {
+            align: 'center',
             field: 'driverName', title: '驱动类型',
             formatter: function (value, row, index) {
                 var type = '';
@@ -86,6 +69,7 @@
             }
         },
         {
+            align: 'center',
             field: 'url', title: '链接',
             formatter: function (value, row, index) {
                 if (row["driverName"] === 'com.microsoft.sqlserver.jdbc.SQLServerDriver')
@@ -93,23 +77,27 @@
                 return value;
             }
         },
-        {field: 'userName', title: '用户名'},
+        {align: 'center', field: 'userName', title: '用户名'},
         {
+            align: 'center',
             field: 'password', title: '密码',
             formatter: function (value, row, index) {
                 return value;
             }
         },
         {
+            align: 'center',
             field: 'updateTime', title: '更新时间',
             formatter: function (value, row, index) {
                 return timeStampToDateString(value, 'yyyy-MM-dd h:m:s');
             }
         },
         {
-            field:'',title:'操作',
-            formatter:function (value,row,index) {
-
+            align: 'center',
+            field: '', title: '操作',
+            formatter: function (value, row, index) {
+                var html = '<a style="cursor: pointer" onclick="">修改</a>';
+                return html;
             }
         }
     ];

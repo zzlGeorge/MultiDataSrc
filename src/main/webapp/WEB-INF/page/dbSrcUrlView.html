@@ -25,8 +25,8 @@
             <select id="dbSrc" class="form-control">
                 <option value="">全部</option>
             </select>
-            <button class="btn btn-default">添加数据库</button>
-            <button class="btn btn-danger">删除数据库</button>
+            <button id="dbSrcDtAddBtn" class="btn btn-default">添加数据库服务</button>
+            <button id="dbSrcDtDelBtn" class="btn btn-danger">删除数据库服务</button>
         </div>
     </div>
 
@@ -46,7 +46,9 @@
 
 <script>
     var cols = [
+        {checkbox: true},
         {align: 'center', field: 'id', title: '序号'},
+        {align: 'center', field: 'serverName', title: '服务器名'},
         {
             align: 'center',
             field: 'driverName', title: '驱动类型',
@@ -103,6 +105,8 @@
     ];
 
     $(function () {
+        $('#dbSrcDtAddBtn').on('click', showAddView);
+        $('#dbSrcDtDelBtn').on('click', deleteDbsrc);
         initSrcNames('#dbSrc');
         initTableServer('#dbSrcUrlTb', cols, '/dbSrc/getSrcUrlInfo', searchParams);
     });
@@ -112,6 +116,137 @@
         params["pageNumber"] = params.offset / params.limit + 1;
         return params;
     }
+
+    function showAddView() {
+        var saveDbDtFun = function () {
+            var srcName = $('#srcName').val();
+            var srcDbName = $('#srcDbName').val();
+            if (srcDbName === undefined || null || '') {
+                alert("请务必输入数据库系统中的数据库名");
+                return;
+            }
+
+            var type = $('#type').val();
+            var srcUrlId = $('#srcUrlId').val();
+            $.ajax({
+                type: "post",
+                url: "/dbSrc/saveDbSrc",
+                data: {
+                    srcName: srcName,
+                    srcDbName: srcDbName,
+                    type: type,
+                    srcUrlId: srcUrlId
+                },
+                success: function (msg) {
+                    console.info(msg);
+                    alert(msg.message);
+                },
+                error: function (msg) {
+                    alert(msg.message);
+                }
+            });
+        };
+        showMode($('#addView').html(),
+            '<button class="btn btn-default" data-dismiss="modal">关闭</button>' +
+            '<button id="saveBtn" class="btn btn-primary">保存</button>',
+            '添加数据库连接信息');
+
+        initSrcUrlNames('#srcUrlId');
+        $('#saveBtn').on('click', saveDbDtFun);
+    }
+
+    function deleteDbsrc() {
+        if (selectData.length === 0) {
+            alert('请勾选要删除的数据！');
+            return;
+        }
+        if (confirm('您确定要删除这' + selectData.length + '条数据吗？')) {
+            var ids = "";
+            for (var i = 0; i < selectData.length; i++) {
+                ids += selectData[i].dbId + ",";
+            }
+            ids = ids.substring(0, ids.length - 1);
+
+            $.ajax({
+                type: "post",
+                url: "/dbSrc/deleteDbSrc",
+                data: {
+                    ids: ids
+                },
+                success: function (msg) {
+                    alert(msg.message);
+                    refreshDefault('#dbSrcTb', searchParams);
+                },
+                error: function (msg) {
+                    alert(msg.message);
+                }
+            });
+        }
+//        alert('111');
+    }
+
+    function showMode(bodyContent, footerContent, titleContent) {
+        if (titleContent !== null)
+            $('#modal-title').html(titleContent);
+        $('#contentBody').html(bodyContent);
+        $('#modal-footer').html(footerContent);
+        $('#my-modal-alert').modal('toggle');
+    }
 </script>
+
+<!-- bootstrap模糊框 -->
+<div class="modal fade" id="my-modal-alert">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times</span><span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="modal-title">模态框</h4><span id="num"></span>
+            </div>
+            <div class="modal-body" id="contentBody">
+                内容
+            </div>
+            <div class="modal-footer" id="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 表单模板 -->
+<div style="display: none" id="addView">
+    <form id="saveForm" class="form-horizontal" role="form">
+        <div class="form-group">
+            <label for="serverName" class="col-sm-3 control-label">服务器名称</label>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" id="serverName" placeholder="请输入服务器名称">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="driverName" class="col-sm-3 control-label">驱动类型</label>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" id="driverName" placeholder="请输入驱动类型">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="url" class="col-sm-3 control-label">链接</label>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" id="url" placeholder="请输入链接">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="userName" class="col-sm-3 control-label">用户名</label>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" id="userName" placeholder="请输入用户名">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="password" class="col-sm-3 control-label">密码</label>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" id="password" placeholder="请输入密码">
+            </div>
+        </div>
+    </form>
+</div>
 </body>
 </html>

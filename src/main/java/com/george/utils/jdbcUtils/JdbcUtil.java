@@ -3,46 +3,55 @@ package com.george.utils.jdbcUtils;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
-public final class JdbcUtil {
+public class JdbcUtil {
     // 表示定义数据库的用户名
-    private static String USERNAME;
+    private String username;
 
     // 定义数据库的密码
-    private static String PASSWORD;
+    private String password;
 
     // 定义数据库的驱动信息
-    private static String DRIVER;
+    private String driver;
 
     // 定义访问数据库的地址
-    private static String URL;
-
-    static {
-        //加载数据库配置信息，并给相关的属性赋值
-        loadConfig();
-    }
+    private String url;
 
     /**
      * 加载数据库配置信息，并给相关的属性赋值
+     *
+     * @param propPath 配置文件路径
+     * @param propKeys 配置文件k-v值
      */
-    private static void loadConfig() {
+    private void loadConfig(String propPath, Map<String, String> propKeys) {
         try {
             InputStream inStream = JdbcUtil.class
-                    .getResourceAsStream("/jdbc.properties");
+                    .getResourceAsStream(propPath);
             Properties prop = new Properties();
             prop.load(inStream);
-            USERNAME = prop.getProperty("jdbc.username");
-            PASSWORD = prop.getProperty("jdbc.password");
-            DRIVER = prop.getProperty("jdbc.driver");
-            URL = prop.getProperty("jdbc.url");
+            username = prop.getProperty(propKeys.get("username"));
+            password = prop.getProperty(propKeys.get("password"));
+            driver = prop.getProperty(propKeys.get("driver"));
+            url = prop.getProperty(propKeys.get("url"));
         } catch (Exception e) {
             throw new RuntimeException("读取数据库配置文件异常！", e);
         }
     }
 
     public JdbcUtil() {
+        Map<String, String> propkeys = new HashMap<String, String>();
+        propkeys.put("username", "jdbc.username");
+        propkeys.put("password", "jdbc.password");
+        propkeys.put("driver", "jdbc.driver");
+        propkeys.put("url", "jdbc.url");
+        loadConfig("/jdbc.properties", propkeys);
+    }
 
+    public JdbcUtil(String propPath, Map<String, String> propKeys) {
+        loadConfig(propPath, propKeys);
     }
 
     /**
@@ -53,8 +62,8 @@ public final class JdbcUtil {
     public Connection getConnection() {
         Connection connection;
         try {
-            Class.forName(DRIVER); // 注册驱动
-            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD); // 获取连接
+            Class.forName(driver); // 注册驱动
+            connection = DriverManager.getConnection(url, username, password); // 获取连接
         } catch (Exception e) {
             throw new RuntimeException("get connection error!", e);
         }

@@ -3,12 +3,13 @@
 <mapper namespace="com.george.dao.mappers.DBDetailsMapper">
 
     <sql id="baseColumns">
-        id,  url , userName , driverName , updateTime , password, `status`, deleteFlag
+        id,  url , serverName, userName , driverName , updateTime , password, `status`, deleteFlag
     </sql>
 
     <resultMap id="dbSrcInfoMap" type="com.george.dao.entities.DBDetailsEntity">
         <id property="id" column="id"/>
         <result property="driverName" column="driverName"/>
+        <result property="serverName" column="serverName"/>
         <result property="url" column="url"/>
         <result property="userName" column="userName"/>
         <result property="password" column="password"/>
@@ -27,6 +28,37 @@
         </collection>
     </resultMap>
 
+    <resultMap id="dbSrcInfoMap3" type="com.george.dao.entities.DBDetailsEntity">
+        <id property="id" column="id"/>
+        <result property="driverName" column="driverName"/>
+        <result property="serverName" column="serverName"/>
+        <result property="url" column="url"/>
+        <result property="userName" column="userName"/>
+        <result property="password" column="password"/>
+        <result property="updateTime" column="updateTime"/>
+        <result property="status" column="status"/>
+        <result property="deleteFlag" column="deleteFlag"/>
+        <collection property="dataBases" ofType="com.george.dao.entities.DBSrcInfoEntity">
+            <id property="dbId" column="dbId"/>
+            <result property="srcName" column="srcName"/>
+            <result property="srcDbName" column="srcDbName"/>
+            <result property="srcUrlId" column="srcUrlId"/>
+            <result property="status" column="status"/>
+            <result property="type" column="type"/>
+            <result property="updateTime" column="updateTime"/>
+            <result property="deleteFlag" column="deleteFlag"/>
+            <collection property="mappers" ofType="com.george.dao.entities.DBSrcMappersEntity">
+                <result property="id" column="id"/>
+                <result property="relativePath" column="relativePath"/>
+                <result property="mapperName" column="mapperName"/>
+                <result property="srcId" column="srcId"/>
+                <result property="remarks" column="remarks"/>
+                <result property="status" column="status"/>
+                <result property="updateTime" column="updateTime"/>
+            </collection>
+        </collection>
+    </resultMap>
+
     <select id="get" parameterType="java.lang.Long" resultType="com.george.dao.entities.DBDetailsEntity">
         SELECT
         <include refid="baseColumns"/>
@@ -42,6 +74,9 @@
             deleteFlag = 0
             <if test="entity.id != null">
                 AND id = #{entity.id}
+            </if>
+            <if test="entity.serverName != null">
+                AND serverName = #{entity.serverName}
             </if>
             <if test="entity.url != null">
                 AND url = #{entity.url}
@@ -82,6 +117,32 @@
         LEFT JOIN db_src_info srcinf ON srcinf.srcUrlId = dt.id
         WHERE srcinf.status = 1 AND srcinf.deleteFlag = 0
     </select>
+    <select id="getDBSrcConnInfo3" parameterType="com.george.dao.entities.DBDetailsEntity" resultMap="dbSrcInfoMap3">
+        SELECT
+            dt.*, srcinf.id dbId,
+            srcinf.srcName,
+            srcinf.srcDbName,
+            srcinf.srcUrlId,
+            srcinf.`status`,
+            srcinf.type,
+            srcinf.updateTime,
+            mp.*
+        FROM
+            db_details dt
+        LEFT JOIN db_src_info srcinf ON srcinf.srcUrlId = dt.id
+        LEFT JOIN (
+            SELECT
+                sm.srcId,
+                m.*
+            FROM
+                src_and_mapper sm
+            LEFT JOIN src_mappers m ON sm.mapperId = m.id
+        ) mp ON mp.srcId = srcinf.id
+        WHERE
+            srcinf.`status` = 1
+        AND srcinf.deleteFlag = 0
+    </select>
+
 
     <select id="getSrcInfo" parameterType="com.george.dao.entities.DBSrcInfoEntity"
             resultType="com.george.dao.entities.DBSrcInfoEntity">
@@ -137,6 +198,39 @@
         #{entity.password} )
     </insert>
 
+    <insert id="saveDbSrcInfo" parameterType="com.george.dao.entities.DBSrcInfoEntity">
+        INSERT INTO db_src_info(srcName,srcUrlId,srcDbName,`type`) VALUE
+        (#{entity.srcName}, #{entity.srcUrlId} , #{entity.srcDbName} , #{entity.type} )
+    </insert>
+
+    <update id="updateDbSrc" parameterType="com.george.dao.entities.DBSrcInfoEntity">
+        UPDATE db_src_info
+        <set>
+            <if test="entity.srcName != null">
+                srcName = #{entity.srcName} ,
+            </if>
+            <if test="entity.srcUrlId != null">
+                srcUrlId = #{entity.srcUrlId} ,
+            </if>
+            <if test="entity.srcDbName != null">
+                srcDbName = #{entity.srcDbName} ,
+            </if>
+            <if test="entity.updateTime != null">
+                updateTime = #{entity.updateTime} ,
+            </if>
+            <if test="entity.type != null">
+                `type` = #{entity.type}
+            </if>
+            <if test="entity.deleteFlag != null">
+                deleteFlag = #{entity.deleteFlag}
+            </if>
+            <if test="entity.status != null">
+                status = #{entity.status}
+            </if>
+        </set>
+        WHERE id = #{entity.id}
+    </update>
+
     <update id="update" parameterType="com.george.dao.entities.DBDetailsEntity">
         UPDATE db_details
         <set>
@@ -157,6 +251,66 @@
             </if>
         </set>
         WHERE id = #{entity.id}
+    </update>
+
+    <!-- 批量更新 -->
+    <update id="updateBatch" parameterType="list">
+        update db_src_info
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="srcName =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.srcName!=null">
+                        when id=#{i.dbId} then #{i.srcName}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix=" srcUrlId =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.srcUrlId!=null">
+                        when id=#{i.dbId} then #{i.srcUrlId}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="srcDbName =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.srcDbName!=null">
+                        when id=#{i.dbId} then #{i.srcDbName}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="type =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.type!=null">
+                        when id=#{i.dbId} then #{i.type}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="status =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.status!=null">
+                        when id=#{i.dbId} then #{i.status}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="updateTime =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.updateTime!=null">
+                        when id=#{i.dbId} then #{i.updateTime}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="deleteFlag =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.deleteFlag!=null">
+                        when id=#{i.dbId} then #{i.deleteFlag}
+                    </if>
+                </foreach>
+            </trim>
+        </trim>
+        where
+        <foreach collection="list" separator="or" item="i" index="index">
+            id=#{i.dbId}
+        </foreach>
     </update>
 
     <delete id="delete" parameterType="java.lang.Long">

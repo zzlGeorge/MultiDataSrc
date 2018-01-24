@@ -1,7 +1,11 @@
 package com.george;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.george.dao.entities.multi.Area;
+import com.george.dao.entities.multi.Province;
+import com.george.dao.mappers.DBDetailsMapper;
 import com.george.dao.mappers.DBSrcMappersEntityMapper;
+import com.george.dao.mappers.ProvinceMapper;
 import com.george.general.Constants;
 import com.george.multidb.Impl.SqlSessionPools;
 import com.george.multidb.SqlSessionHelper;
@@ -17,8 +21,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.sql.DataSource;
 import java.sql.*;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.Date;
 
 /**
  * Created by George on 2017/12/12.
@@ -32,35 +36,9 @@ public class CommonTest {
 
     @Test
     public void testCommon() {
-        /*try {
-            druidDataSource.getConnection();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }*/
-        final SqlSession sqlSession = SqlSessionHelper.getSqlSession(1);
-        System.out.println(sqlSession.selectOne("com.george.dao.mappers.DemoMapper.selectOne"));
-        for (int i = 0; i < 20; i++) {
-            Thread t = new Thread(new Runnable() {
-                public void run() {
-                    System.out.println("aaa:  "+sqlSession.selectOne("com.george.dao.mappers.DemoMapper.selectOne"));
-                }
-            });
-            t.start();
-        }
-        System.out.println();
-
-        /*DataSource ds = SqlSessionHelper.getDataSource(2);
-        Connection conn;
-        System.out.println(ds instanceof PooledDataSource);
-        PooledDataSource poolDs = (PooledDataSource)ds;
-        poolDs.getPoolState().getActiveConnectionCount();
-        try {
-            conn = ds.getConnection();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        System.out.println(Constants.ROOT_PATH);*/
+        System.out.println(Constants.ROOT_PATH);
     }
+
 
     @Test
     public void testGetConn() {
@@ -142,5 +120,13 @@ public class CommonTest {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+
+    @Test
+    public void testCommon2() {
+        String str = "¹ãÖÝÊÐ";
+        System.out.println(str.substring(0, 2));
+        System.out.println(str);
     }
 }

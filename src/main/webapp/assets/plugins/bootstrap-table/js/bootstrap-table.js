@@ -357,7 +357,7 @@
         icons: {
             paginationSwitchDown: 'glyphicon-collapse-down icon-chevron-down',
             paginationSwitchUp: 'glyphicon-collapse-up icon-chevron-up',
-            refresh: 'glyphicon-refresh icon-refresh',
+            refresh: 'glyphicon-refreshDefault icon-refreshDefault',
             toggle: 'glyphicon-list-alt icon-list-alt',
             columns: 'glyphicon-th icon-th',
             detailOpen: 'glyphicon-plus icon-plus',
@@ -1076,7 +1076,7 @@
             html.push(sprintf('<button class="btn' +
                     sprintf(' btn-%s', this.options.buttonsClass) +
                     sprintf(' btn-%s', this.options.iconSize) +
-                    '" type="button" name="refresh" aria-label="refresh" title="%s">',
+                    '" type="button" name="refreshDefault" aria-label="refreshDefault" title="%s">',
                     this.options.formatRefresh()),
                 sprintf('<i class="%s %s"></i>', this.options.iconsPrefix, this.options.icons.refresh),
                 '</button>');
@@ -1139,7 +1139,7 @@
         }
 
         if (this.options.showRefresh) {
-            this.$toolbar.find('button[name="refresh"]')
+            this.$toolbar.find('button[name="refreshDefault"]')
                 .off('click').on('click', $.proxy(this.refresh, this));
         }
 
@@ -2914,7 +2914,7 @@
             return;
         }
         this.options = $.extend(this.options, options);
-        this.trigger('refresh-options', this.options);
+        this.trigger('refreshDefault-options', this.options);
         this.destroy();
         this.init();
     };

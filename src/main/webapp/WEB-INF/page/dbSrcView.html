@@ -9,6 +9,7 @@
     <!-- Bootstrap -->
     <link href="/assets/plugins/bootstrap-3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/assets/plugins/bootstrap-table/css/bootstrap-table.min.css">
+    <link href="/assets/plugins/x-editable/css/bootstrap-editable.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/childPage.css">
 
     <!--[if lt IE 9]>
@@ -25,8 +26,8 @@
                 <option value="">全部</option>
             </select>
 
-            <button class="btn btn-default">添加数据库</button>
-            <button class="btn btn-danger">删除数据库</button>
+            <button id="addBtn" class="btn btn-default">添加数据库</button>
+            <button id="deleteBtn" class="btn btn-danger">删除数据库</button>
         </div>
     </div>
 
@@ -42,14 +43,32 @@
 <script src="/assets/plugins/bootstrap-table/js/bootstrap.min.js"></script>
 <script src="/assets/plugins/bootstrap-table/js/bootstrap-table.js"></script>
 <script src="/assets/plugins/bootstrap-table/js/bootstrap-table-zh-CN.js"></script>
+<script src="/assets/plugins/x-editable/js/bootstrap-editable.min.js"></script>
+<script src="/assets/plugins/x-editable/bootstrap-table-editable.js"></script>
 <script src="/js/common.js"></script>
 
 <script>
     var cols = [
         {checkbox: true},
         {align: 'center', field: 'dbId', title: '数据源ID'},
-        {align: 'center', field: 'srcName', title: '名称'},
-        {align: 'center', field: 'srcDbName', title: '数据库名'},
+        {
+            align: 'center', field: 'srcName', title: '名称',
+            editable: {
+                type: 'text',
+                title: '名称',
+                validate: function (v) {
+                    if (!v) return '名称不能为空';
+                }
+            }
+        },
+        {
+            align: 'center', field: 'srcDbName', title: '数据库名',
+            editable: {
+                type: 'text',
+                title: '名称',
+                emptytext: ""
+            }
+        },
         {
             align: 'center',
             field: 'type', title: '类型',
@@ -74,11 +93,10 @@
         {
             align: 'center',
             field: 'status', title: '状态',
-            formatter: function (value, row, index) {
-                if (value === 1)
-                    return '启用';
-                else if (value === 0)
-                    return '停用';
+            editable: {
+                type: 'select',
+                title: '状态',
+                source: [{value: "1", text: "启用"}, {value: "0", text: "停用"}]
             }
         },
         {
@@ -93,15 +111,29 @@
             field: '', title: '操作',
             formatter: function (value, row, index) {
                 var html = '<a style="cursor: pointer" onclick="viewUrlDetails(' + row["srcUrlId"] + ')">查看连接信息</a>';
-                html += '&nbsp;&nbsp;<a style="cursor: pointer" onclick="">修改</a>';
+                html += '&nbsp;&nbsp;<a style="cursor: pointer" onclick="saveChange(' + index + ')">保存修改</a>';
                 return html;
             }
         }
     ];
 
+    var selectData = [];
+
     $(function () {
+        $('#addBtn').on('click', showAddView);
+        $('#deleteBtn').on('click', deleteDbsrc);
+
         initSrcNames('#dbSrc');
         initTableServer('#dbSrcTb', cols, '/dbSrc/srcInfoView', searchParams);
+        tableRefreshOpDefine('#dbSrcTb', {
+            onCheck: function (row) {
+                console.info(row);
+                selectData.push(row);
+            },
+            onUncheck: function (row) {
+                selectData = arrayDelete(selectData, row, 'dbId', 1);
+            }
+        });
     });
 
     function searchParams(params) {
@@ -122,13 +154,99 @@
                 contentHtml += '<div style="margin: 5px 5px"><span>驱动名：' + data["driverName"] + '</span>' +
                     '<p><span>url：' + data["url"] + '</span></p>' +
                     '<p><span>用户名：' + data["userName"] + '</span><span>密码：' + data["password"] + '</span></p></div>';
-                showMode(contentHtml);
+                showMode(contentHtml, '');
             }
         });
     }
 
-    function showMode(content) {
-        $('#contentBody').html(content);
+    function showAddView() {
+        var saveDbInfoFun = function () {
+            var srcName = $('#srcName').val();
+            var srcDbName = $('#srcDbName').val();
+            if (srcDbName === undefined || null || '') {
+                alert("请务必输入数据库系统中的数据库名");
+                return;
+            }
+
+            var type = $('#type').val();
+            var srcUrlId = $('#srcUrlId').val();
+            $.ajax({
+                type: "post",
+                url: "/dbSrc/saveDbSrc",
+                data: {
+                    srcName: srcName,
+                    srcDbName: srcDbName,
+                    type: type,
+                    srcUrlId: srcUrlId
+                },
+                success: function (msg) {
+                    console.info(msg);
+                    alert(msg.message);
+                },
+                error: function (msg) {
+                    alert(msg.message);
+                }
+            });
+        };
+        showMode($('#addView').html(),
+            '<button class="btn btn-default" data-dismiss="modal">关闭</button>' +
+            '<button id="saveBtn" class="btn btn-primary">保存</button>');
+
+        initSrcUrlNames('#srcUrlId');
+        $('#saveBtn').on('click', saveDbInfoFun);
+    }
+
+    function deleteDbsrc() {
+        if (selectData.length === 0) {
+            alert('请勾选要删除的数据！');
+            return;
+        }
+        if (confirm('您确定要删除这' + selectData.length + '条数据吗？')) {
+            var ids = "";
+            for (var i = 0; i < selectData.length; i++) {
+                ids += selectData[i].dbId + ",";
+            }
+            ids = ids.substring(0, ids.length - 1);
+
+            $.ajax({
+                type: "post",
+                url: "/dbSrc/deleteDbSrc",
+                data: {
+                    ids: ids
+                },
+                success: function (msg) {
+                    alert(msg.message);
+                    refreshDefault('#dbSrcTb', searchParams);
+                },
+                error: function (msg) {
+                    alert(msg.message);
+                }
+            });
+        }
+//        alert('111');
+    }
+
+    function saveChange(index) {
+        var row = $('#dbSrcTb').bootstrapTable('getData')[index];
+        $.ajax({
+            type: "post",
+            url: "/dbSrc/updateDbSrc",
+            data: {
+                entityString: JSON.stringify(row)
+            },
+            success: function (msg) {
+                alert(msg.message);
+                refreshDefault('#dbSrcTb', searchParams);
+            },
+            error: function (msg) {
+                alert(msg.message);
+            }
+        });
+    }
+
+    function showMode(bodyContent, footerContent) {
+        $('#contentBody').html(bodyContent);
+        $('#modal-footer').html(footerContent);
         $('#my-modal-alert').modal('toggle');
     }
 </script>
@@ -147,11 +265,49 @@
                 内容
             </div>
             <div class="modal-footer" id="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary">保存</button>
+                <!--<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>-->
+                <!--<button type="button" class="btn btn-primary">保存</button>-->
             </div>
         </div>
     </div>
+</div>
+
+<!-- 表单模板 -->
+<div style="display: none" id="addView">
+    <form id="saveForm" class="form-horizontal" role="form">
+        <div class="form-group">
+            <label for="srcName" class="col-sm-3 control-label">数据库名称</label>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" id="srcName" placeholder="请输入数据库名称">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="srcDbName" class="col-sm-3 control-label">数据库名</label>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" id="srcDbName" placeholder="请输入在数据库系统中代表的数据库名">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="type" class="col-sm-3 control-label">类型</label>
+            <div class="col-sm-6">
+                <select id="type" class="form-control">
+                    <option value="1">MySql</option>
+                    <option value="2">Sql Server</option>
+                    <option value="3">Oracle</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="srcUrlId" class="col-sm-3 control-label">数据库服务地址</label>
+            <div class="col-sm-6">
+                <select id="srcUrlId" class="form-control">
+                </select>
+            </div>
+            <div class="col-sm-3">
+                <button id="addNewDbServerBtn" class="btn btn-warning">Add New</button>
+            </div>
+        </div>
+    </form>
 </div>
 </body>
 </html>

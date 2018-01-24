@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -68,5 +69,28 @@ public class DatabaseSrcServiceImpl implements DatabaseSrcService {
         DBSrcInfoEntity paramEntity = new DBSrcInfoEntity();
         paramEntity.setIds(ids.substring(0, ids.length() - 2));
         return dbDetailsMapper.getSrcInfo(paramEntity);
+    }
+
+    public boolean saveDbSrc(DBSrcInfoEntity entity) {
+        entity.setUpdateTime(new Date());
+        return dbDetailsMapper.saveDbSrcInfo(entity) > 0 ? true : false;
+    }
+
+    public boolean deleteDbSrc(Integer[] ids) {
+        if (ids == null) return false;
+        List<DBSrcInfoEntity> list = new LinkedList<DBSrcInfoEntity>();
+        for (int i = 0; i < ids.length; i++) {
+            DBSrcInfoEntity entity = new DBSrcInfoEntity();
+            entity.setDbId(ids[i]);
+            entity.setDeleteFlag(1);
+            list.add(entity);
+        }
+        return dbDetailsMapper.updateBatch(list) > 0 ? true : false;
+    }
+
+    public boolean updateDbSrc(DBSrcInfoEntity entity) {
+        List<DBSrcInfoEntity> list = new LinkedList<DBSrcInfoEntity>();
+        list.add(entity);
+        return dbDetailsMapper.updateBatch(list) > 0 ? true : false;
     }
 }

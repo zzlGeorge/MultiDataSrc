@@ -8,6 +8,7 @@ import java.util.List;
 @Table(name = "db_details")
 public class DBDetailsEntity {
     private Integer id;
+    private String serverName;
     private String driverName;
     private String url;
     private String userName;
@@ -23,6 +24,14 @@ public class DBDetailsEntity {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getServerName() {
+        return serverName;
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
     }
 
     public String getDriverName() {

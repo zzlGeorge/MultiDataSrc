@@ -7,6 +7,8 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ include file="/WEB-INF/jsp/common/common.jsp" %>
+<%@ include file="/WEB-INF/jsp/child.jsp" %>
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -29,6 +31,8 @@
 <div style="margin: 10% 18%;">
     <table id="table"></table>
 </div>
+<h1>事发后的身体就会人的团聚</h1>
+<button onclick="refreshMaterials()">aaaaaa</button>
 <script src="${js}/jquery/jquery.min.js"></script>
 <script src="${plugins}/bootstrap-3.3.7/js/bootstrap.min.js"></script>
 <script src="${plugins}/bootstrap-table/js/bootstrap.min.js"></script>
@@ -36,9 +40,11 @@
 <script src="${plugins}/bootstrap-table/js/bootstrap-table-zh-CN.js"></script>
 <script>
     $(function () {
+    });
+    /*$(function () {
         var cols = [{
             field: 'id',
-            title: 'ID'
+            title: 'id'
         }, {
             field: 'name',
             title: '名称'
@@ -73,7 +79,7 @@
             columns: cols,
             data: data
         });
-    }
+    }*/
 </script>
 </body>
 </html>

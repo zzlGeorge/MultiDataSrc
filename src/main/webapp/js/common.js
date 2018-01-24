@@ -1,5 +1,8 @@
-﻿function initTableClient($table, cols, data) {
-    $($table).bootstrapTable({
+﻿/**
+ * 初始化bootstrap table （前端数据）
+ * */
+function initTableClient($table, cols, data) {
+    var table = $($table).bootstrapTable({
         pagination: true,
         pageNumber: 1,
         pageSize: 5,
@@ -8,10 +11,14 @@
         columns: cols,
         data: data
     });
+    return table;
 }
 
+/**
+ * 初始化bootstrap table （后端数据）
+ * */
 function initTableServer($id, cols, url, params) {
-    $($id).bootstrapTable({
+    var table = $($id).bootstrapTable({
         striped: true,
         url: url,
         method: 'post',
@@ -34,6 +41,7 @@ function initTableServer($id, cols, url, params) {
             };
         }
     });
+    return table;
 }
 
 /**
@@ -50,11 +58,18 @@ function refreshBTable($id, params, cols) {
 /**
  * 无列变化的刷新
  * */
-function refresh($id, params) {
+function refreshDefault($id, params) {
     $($id).bootstrapTable('refreshOptions', {
         pageNumber: 1,
         queryParams: params
     });
+}
+
+/**
+ * 自定义table属性刷新
+ * */
+function tableRefreshOpDefine($id, option) {
+    $($id).bootstrapTable('refreshOptions', option);
 }
 
 /**
@@ -77,6 +92,42 @@ function initSrcNames($selectId) {
     });
 }
 
+/**
+ * 数据库服务信息下拉框
+ * */
+function initSrcUrlNames($selectId) {
+    $.ajax({
+        type: "POST",
+        url: "/dbSrc/getAllSrcUrlInfo",
+        data: {},
+        success: function (msg) {
+            var optionsHtml = '';
+            var data = msg.dataList;
+            for (var i = 0; i < data.length; i++) {
+                var obj = data[i];
+                optionsHtml += '<option value="' + obj["id"] + '">' + obj["serverName"] + '</option>';
+            }
+            $($selectId).html(optionsHtml);
+        }
+    });
+}
+
+/**
+ * 删除于数组中的指定数据之后的deleteCount个数据
+ * */
+function arrayDelete(array, row, key, deleteCount) {
+    var index;
+    for (var i = 0; i < array.length; i++) {
+        if (array[i][key] === row[key]) {
+            index = i;
+            break;
+        }
+        if (i === array.length - 1)
+            return array;
+    }
+    array.splice(index, deleteCount);
+    return array;
+}
 
 /**
  * 将日期时间戳转换为指定格式日期字符串

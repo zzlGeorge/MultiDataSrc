@@ -14,7 +14,18 @@ import java.util.List;
 public interface DBDetailsMapper extends CRUDMapper<DBDetailsEntity, Long> {
     List<DBDetailsEntity> getDBSrcConnInfo(@Param("entity") DBDetailsEntity entity);
 
+    List<DBDetailsEntity> getDBSrcConnInfo3(@Param("entity") DBDetailsEntity entity);
+
     List<DBSrcInfoEntity> getSrcInfo(@Param("entity") DBSrcInfoEntity entity);
 
     List<DBDetailsEntity> findByEntity(@Param("entity") DBDetailsEntity entity);
+
+    int saveDbSrcInfo(@Param("entity") DBSrcInfoEntity entity);
+
+    int updateDbSrc(@Param("entity") DBSrcInfoEntity entity);
+
+    /**
+     * 批量更新信息
+     */
+    int updateBatch(@Param("list") List<DBSrcInfoEntity> list);
 }

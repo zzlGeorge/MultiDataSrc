@@ -3,6 +3,7 @@ package com.george.dao.entities;
 import com.george.utils.generators.mybatis.generator.annotation.Table;
 
 import java.util.Date;
+import java.util.List;
 
 @Table(name = "db_src_info")
 public class DBSrcInfoEntity {
@@ -14,6 +15,8 @@ public class DBSrcInfoEntity {
     private Integer status;    //状态；1：启用  0：不启用
     private Date updateTime;
     private Integer deleteFlag;
+
+    private List<DBSrcMappersEntity> mappers;
 
     //另加
     private String ids; //id集合
@@ -88,5 +91,13 @@ public class DBSrcInfoEntity {
 
     public void setDeleteFlag(Integer deleteFlag) {
         this.deleteFlag = deleteFlag;
+    }
+
+    public List<DBSrcMappersEntity> getMappers() {
+        return mappers;
+    }
+
+    public void setMappers(List<DBSrcMappersEntity> mappers) {
+        this.mappers = mappers;
     }
 }

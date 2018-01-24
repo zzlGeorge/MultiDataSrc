@@ -23,4 +23,18 @@ public interface DatabaseSrcService {
      * 找到指定mapper的数据源使用者
      * */
     List<DBSrcInfoEntity> getMapperDbUser(Integer mapperId);
+
+
+
+    /**
+     * 保存数据库相关信息
+     * */
+    boolean saveDbSrc(DBSrcInfoEntity entity);
+
+    boolean deleteDbSrc(Integer[] ids);
+
+    /**
+     * 更新数据库基本信息
+     * */
+    boolean updateDbSrc(DBSrcInfoEntity entity);
 }

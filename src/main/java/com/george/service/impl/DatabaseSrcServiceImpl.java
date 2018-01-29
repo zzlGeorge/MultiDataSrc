@@ -28,23 +28,8 @@ public class DatabaseSrcServiceImpl implements DatabaseSrcService {
     @Autowired
     private DBDetailsMapper dbDetailsMapper;
 
-    @Autowired
-    private DBSrcMappersEntityMapper dbSrcMappersEntityMapper;
-
     public List<DBSrcInfoEntity> getSrcInfo(DBSrcInfoEntity entity) {
         return dbDetailsMapper.getSrcInfo(entity);
-    }
-
-    public List<DBDetailsEntity> getSrcDetailsInfo(DBDetailsEntity entity) {
-        return dbDetailsMapper.getDBSrcConnInfo(entity);
-    }
-
-    public List<DBDetailsEntity> getSrcUrlInfo(DBDetailsEntity entity) {
-        return dbDetailsMapper.findByEntity(entity);
-    }
-
-    public List<DBSrcMappersEntity> getSrcMappersInfo(DBSrcMappersEntity entity) {
-        return dbSrcMappersEntityMapper.findByEntity(entity, null);
     }
 
     public List<DBSrcInfoEntity> getMapperDbUser(Integer mapperId) {

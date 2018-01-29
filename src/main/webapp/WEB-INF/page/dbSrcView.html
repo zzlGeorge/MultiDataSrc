@@ -127,7 +127,7 @@
         initTableServer('#dbSrcTb', cols, '/dbSrc/srcInfoView', searchParams);
         tableRefreshOpDefine('#dbSrcTb', {
             onCheck: function (row) {
-                console.info(row);
+//                console.info(row);
                 selectData.push(row);
             },
             onUncheck: function (row) {
@@ -182,6 +182,7 @@
                 success: function (msg) {
                     console.info(msg);
                     alert(msg.message);
+                    refreshDefault('#dbSrcUrlTb', searchParams);
                 },
                 error: function (msg) {
                     alert(msg.message);

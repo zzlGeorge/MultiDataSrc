@@ -13,18 +13,10 @@ import java.util.List;
 public interface DatabaseSrcService {
     List<DBSrcInfoEntity> getSrcInfo(DBSrcInfoEntity entity);
 
-    List<DBDetailsEntity> getSrcDetailsInfo(DBDetailsEntity entity);
-
-    List<DBDetailsEntity> getSrcUrlInfo(DBDetailsEntity entity);
-
-    List<DBSrcMappersEntity> getSrcMappersInfo(DBSrcMappersEntity entity);
-
     /**
      * 找到指定mapper的数据源使用者
      * */
     List<DBSrcInfoEntity> getMapperDbUser(Integer mapperId);
-
-
 
     /**
      * 保存数据库相关信息
@@ -37,4 +29,5 @@ public interface DatabaseSrcService {
      * 更新数据库基本信息
      * */
     boolean updateDbSrc(DBSrcInfoEntity entity);
+
 }

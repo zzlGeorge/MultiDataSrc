@@ -191,11 +191,10 @@
         <include refid="com.george.utils.generators.mybatis.mapper.CRUDMapper.orderBy"/>
     </select>
 
-    <insert id="save" parameterType="com.george.dao.entities.DBDetailsEntity" useGeneratedKeys="true"
-            keyProperty="entity.id">
-        INSERT INTO db_details(<include refid="baseColumns"/>) VALUE
-        (#{entity.id}, #{entity.url} , #{entity.userName} , #{entity.driverName} , #{entity.updateTime} ,
-        #{entity.password} )
+    <insert id="saveDbUrlSrc" parameterType="com.george.dao.entities.DBDetailsEntity">
+        INSERT INTO db_details(url , serverName, userName , driverName , updateTime , password, `status`) VALUE
+        (#{entity.url},#{entity.serverName}, #{entity.userName} , #{entity.driverName} , #{entity.updateTime} ,
+        #{entity.password},#{entity.status})
     </insert>
 
     <insert id="saveDbSrcInfo" parameterType="com.george.dao.entities.DBSrcInfoEntity">
@@ -310,6 +309,72 @@
         where
         <foreach collection="list" separator="or" item="i" index="index">
             id=#{i.dbId}
+        </foreach>
+    </update>
+
+    <update id="updateBatchDbUrl" parameterType="list">
+        update db_details
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="url =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.url!=null">
+                        when id=#{i.id} then #{i.url}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix=" serverName =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.serverName!=null">
+                        when id=#{i.id} then #{i.serverName}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="userName =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.userName!=null">
+                        when id=#{i.id} then #{i.userName}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="password =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.password!=null">
+                        when id=#{i.id} then #{i.password}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="driverName =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.driverName!=null">
+                        when id=#{i.id} then #{i.driverName}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="status =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.status!=null">
+                        when id=#{i.id} then #{i.status}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="updateTime =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.updateTime!=null">
+                        when id=#{i.id} then #{i.updateTime}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="deleteFlag =case" suffix="end,">
+                <foreach collection="list" item="i" index="index">
+                    <if test="i.deleteFlag!=null">
+                        when id=#{i.id} then #{i.deleteFlag}
+                    </if>
+                </foreach>
+            </trim>
+        </trim>
+        where
+        <foreach collection="list" separator="or" item="i" index="index">
+            id=#{i.id}
         </foreach>
     </update>
 

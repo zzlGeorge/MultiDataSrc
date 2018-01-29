@@ -28,7 +28,7 @@ public class MultiDatabaseInitListener implements ServletContextListener {
         try {
             JdbcUtil jdbcUtil = new JdbcUtil();
             List<Map<String, Object>> srcIds = JdbcDao.findResult(jdbcUtil.getConnection(),
-                    "select id from db_src_info where status=1", null);
+                    "select id from db_src_info where status=1 and deleteFlag = 0", null);
             int count = 0;
             for (Map<String, Object> m : srcIds) {
                 Integer id = (Integer) m.get("id");

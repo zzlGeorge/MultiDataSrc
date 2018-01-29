@@ -21,6 +21,7 @@ public interface DBDetailsMapper extends CRUDMapper<DBDetailsEntity, Long> {
     List<DBDetailsEntity> findByEntity(@Param("entity") DBDetailsEntity entity);
 
     int saveDbSrcInfo(@Param("entity") DBSrcInfoEntity entity);
+    int saveDbUrlSrc(@Param("entity") DBDetailsEntity entity);
 
     int updateDbSrc(@Param("entity") DBSrcInfoEntity entity);
 
@@ -28,4 +29,9 @@ public interface DBDetailsMapper extends CRUDMapper<DBDetailsEntity, Long> {
      * 批量更新信息
      */
     int updateBatch(@Param("list") List<DBSrcInfoEntity> list);
+
+    /**
+     * 批量更新数据库服务信息
+     * */
+    int updateBatchDbUrl(@Param("list") List<DBDetailsEntity> list);
 }

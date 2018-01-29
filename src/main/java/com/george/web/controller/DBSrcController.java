@@ -35,22 +35,6 @@ public class DBSrcController {
     }
 
     /**
-     * 数据源Mapper信息页面
-     */
-    @RequestMapping(value = "/dbMappersView", method = RequestMethod.GET)
-    public String dbMappersViewPage() {
-        return "page/mappersMgr/mappersMgr";
-    }
-
-    /**
-     * 数据源连接信息页面
-     */
-    @RequestMapping(value = "/dbSrcUrlView", method = RequestMethod.GET)
-    public String dbSrcUrlViewPage() {
-        return "page/dbSrcUrlView";
-    }
-
-    /**
      * 数据源名称获取
      */
     @RequestMapping(value = "/baseSrcInfo", method = RequestMethod.GET)
@@ -77,85 +61,6 @@ public class DBSrcController {
         return FilterData.splitPage(param, data);
     }
 
-    /**
-     * 数据源较完整信息（包含连接信息）
-     */
-    @RequestMapping(value = "/getSrcInfo", method = RequestMethod.GET)
-    @ResponseBody
-    public Object getSrcInfoGET(ParamObject param, DBDetailsEntity entity) {
-        return getSrcInfo(param, entity);
-    }
-
-    @RequestMapping(value = "/getSrcInfo", method = RequestMethod.POST)
-    @ResponseBody
-    public Object getSrcInfo(ParamObject param, DBDetailsEntity entity) {
-        List<DBDetailsEntity> data = databaseSrcService.getSrcDetailsInfo(entity);
-        param.setDataList(data);
-        return param;
-    }
-
-    /**
-     * 数据源较完整信息（包含连接信息）
-     */
-    @RequestMapping(value = "/getSrcUrlInfo", method = RequestMethod.GET)
-    @ResponseBody
-    public Object getSrcUrlInfoGET(ParamObject param, DBDetailsEntity entity) {
-        return getSrcUrlInfo(param, entity);
-    }
-
-    @RequestMapping(value = "/getSrcUrlInfo", method = RequestMethod.POST)
-    @ResponseBody
-    public Object getSrcUrlInfo(ParamObject param, DBDetailsEntity entity) {
-        List<DBDetailsEntity> data = databaseSrcService.getSrcUrlInfo(entity);
-        return FilterData.splitPage(param, data);
-    }
-
-    /**
-     * 获取所有数据库服务链接的信息
-     */
-    @RequestMapping(value = "/getAllSrcUrlInfo", method = RequestMethod.POST)
-    @ResponseBody
-    public Object getAllSrcUrlInfo(ParamObject param, DBDetailsEntity entity) {
-        List<DBDetailsEntity> data = databaseSrcService.getSrcUrlInfo(entity);
-        param.setDataList(data);
-        return param;
-    }
-
-    /**
-     * 获取某个数据库的连接信息
-     */
-    @RequestMapping(value = "/getOneUrlInfo", method = RequestMethod.GET)
-    @ResponseBody
-    public Object getSrcUrlInfoGET(DBDetailsEntity entity) {
-        return getSrcUrlInfo(entity);
-    }
-
-    @RequestMapping(value = "/getOneUrlInfo", method = RequestMethod.POST)
-    @ResponseBody
-    public Object getSrcUrlInfo(DBDetailsEntity entity) {
-        List<DBDetailsEntity> data = databaseSrcService.getSrcUrlInfo(entity);
-        ParamObject paramObject = new ParamObject();
-        paramObject.setDataList(data);
-        return paramObject;
-    }
-
-    /**
-     * 数据源mappers仓库信息查询
-     */
-    @RequestMapping(value = "/getSrcMappers", method = RequestMethod.GET)
-    @ResponseBody
-    public Object getSrcMappersGET(ParamObject param, DBSrcMappersEntity entity) {
-        return getSrcMappers(param, entity);
-    }
-
-    @RequestMapping(value = "/getSrcMappers", method = RequestMethod.POST)
-    @ResponseBody
-    public Object getSrcMappers(ParamObject param, DBSrcMappersEntity entity) {
-        List<DBSrcMappersEntity> data = databaseSrcService.getSrcMappersInfo(entity);
-        return FilterData.splitPage(param, data);
-    }
-
-
     @RequestMapping(value = "/getMapperDbUser", method = RequestMethod.GET)
     @ResponseBody
     public Object getMapperDbUserGET(ParamObject param, Integer mapperId) {
@@ -174,6 +79,7 @@ public class DBSrcController {
         List<DBSrcInfoEntity> data = databaseSrcService.getMapperDbUser(mapperId);
         return FilterData.splitPage(param, data);
     }
+
 
     @RequestMapping(value = "/saveDbSrc", method = RequestMethod.POST)
     @ResponseBody

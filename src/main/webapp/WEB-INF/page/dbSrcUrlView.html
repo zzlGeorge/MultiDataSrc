@@ -42,33 +42,53 @@
 <script src="/assets/plugins/bootstrap-table/js/bootstrap.min.js"></script>
 <script src="/assets/plugins/bootstrap-table/js/bootstrap-table.js"></script>
 <script src="/assets/plugins/bootstrap-table/js/bootstrap-table-zh-CN.js"></script>
+<script src="/assets/plugins/x-editable/js/bootstrap-editable.min.js"></script>
+<script src="/assets/plugins/x-editable/bootstrap-table-editable.js"></script>
 <script src="/js/common.js"></script>
 
 <script>
     var cols = [
         {checkbox: true},
         {align: 'center', field: 'id', title: '序号'},
-        {align: 'center', field: 'serverName', title: '服务器名'},
+        {
+            align: 'center', field: 'serverName', title: '服务器名',
+            editable: {
+                type: 'text',
+                title: '服务器名',
+                validate: function (v) {
+                    if (!v) return '服务器名不能为空';
+                }
+            }
+        },
         {
             align: 'center',
             field: 'driverName', title: '驱动类型',
-            formatter: function (value, row, index) {
-                var type = '';
-                switch (value) {
-                    case "com.mysql.jdbc.Driver":
-                        type = 'MySql';
-                        break;
-                    case "com.microsoft.sqlserver.jdbc.SQLServerDriver":
-                        type = 'SqlServer';
-                        break;
-                    case "oracle.jdbc.driver.OracleDriver":
-                        type = 'MySql';
-                        break;
-                    default:
-                        break;
-                }
-                return type;
+            editable: {
+                type: 'select',
+                title: '驱动类型',
+                source: [
+                    {value: "com.mysql.jdbc.Driver", text: "MySql"},
+                    {value: "com.microsoft.sqlserver.jdbc.SQLServerDriver", text: "SqlServer"},
+                    {value: "oracle.jdbc.driver.OracleDriver", text: "Oracle"}
+                ]
             }
+//            formatter: function (value, row, index) {
+//                var type = '';
+//                switch (value) {
+//                    case "com.mysql.jdbc.Driver":
+//                        type = 'MySql';
+//                        break;
+//                    case "com.microsoft.sqlserver.jdbc.SQLServerDriver":
+//                        type = 'SqlServer';
+//                        break;
+//                    case "oracle.jdbc.driver.OracleDriver":
+//                        type = 'Oracle';
+//                        break;
+//                    default:
+//                        break;
+//                }
+//                return type;
+//            }
         },
         {
             align: 'center',
@@ -79,36 +99,59 @@
                 return value;
             }
         },
-        {align: 'center', field: 'userName', title: '用户名'},
+        {
+            align: 'center', field: 'userName', title: '用户名',
+            editable: {
+                type: 'text',
+                title: '用户名',
+                validate: function (v) {
+                    if (!v) return '用户名不能为空';
+                }
+            }
+        },
         {
             align: 'center',
             field: 'password', title: '密码',
-            formatter: function (value, row, index) {
-                return value;
+            editable: {
+                type: 'text',
+                title: '密码',
+                validate: function (v) {
+                    if (!v) return '密码不能为空';
+                }
             }
         },
         {
             align: 'center',
             field: 'updateTime', title: '更新时间',
             formatter: function (value, row, index) {
-                return timeStampToDateString(value, 'yyyy-MM-dd h:m:s');
+                return timeStampToDateString(value, 'yyyy-MM-dd h:m:s');//yyyy-MM-dd h:m:s
             }
         },
         {
             align: 'center',
             field: '', title: '操作',
             formatter: function (value, row, index) {
-                var html = '<a style="cursor: pointer" onclick="">修改</a>';
+                var html = '<a style="cursor: pointer" onclick="saveChange(' + index + ')">保存修改</a>';
                 return html;
             }
         }
     ];
 
+    var selectData = [];
     $(function () {
         $('#dbSrcDtAddBtn').on('click', showAddView);
         $('#dbSrcDtDelBtn').on('click', deleteDbsrc);
         initSrcNames('#dbSrc');
         initTableServer('#dbSrcUrlTb', cols, '/dbSrc/getSrcUrlInfo', searchParams);
+        tableRefreshOpDefine('#dbSrcUrlTb', {
+            onCheck: function (row) {
+//                console.info(row);
+                selectData.push(row);
+            },
+            onUncheck: function (row) {
+                selectData = arrayDelete(selectData, row, 'id', 1);
+            }
+        });
     });
 
     function searchParams(params) {
@@ -119,27 +162,31 @@
 
     function showAddView() {
         var saveDbDtFun = function () {
-            var srcName = $('#srcName').val();
-            var srcDbName = $('#srcDbName').val();
-            if (srcDbName === undefined || null || '') {
-                alert("请务必输入数据库系统中的数据库名");
+            var serverName = $('#serverName').val();
+            var driverName = $('#driverName').val();
+            var url = $('#url').val();
+            var userName = $('#userName').val();
+            var password = $('#password').val();
+            var status = $('#status').val();
+            if (serverName === undefined || null || '') {//验证
+                alert("请务必输入服务器名称！");
                 return;
             }
-
-            var type = $('#type').val();
-            var srcUrlId = $('#srcUrlId').val();
             $.ajax({
                 type: "post",
-                url: "/dbSrc/saveDbSrc",
+                url: "/dbSrc/saveDbUrlSrc",
                 data: {
-                    srcName: srcName,
-                    srcDbName: srcDbName,
-                    type: type,
-                    srcUrlId: srcUrlId
+                    serverName: serverName,
+                    driverName: driverName,
+                    url: url+';databaseName=',
+                    userName: userName,
+                    password: password,
+                    status: status
                 },
                 success: function (msg) {
                     console.info(msg);
                     alert(msg.message);
+                    refreshDefault('#dbSrcUrlTb', searchParams);
                 },
                 error: function (msg) {
                     alert(msg.message);
@@ -151,7 +198,7 @@
             '<button id="saveBtn" class="btn btn-primary">保存</button>',
             '添加数据库连接信息');
 
-        initSrcUrlNames('#srcUrlId');
+//        initSrcUrlNames('#srcUrlId');
         $('#saveBtn').on('click', saveDbDtFun);
     }
 
@@ -163,19 +210,19 @@
         if (confirm('您确定要删除这' + selectData.length + '条数据吗？')) {
             var ids = "";
             for (var i = 0; i < selectData.length; i++) {
-                ids += selectData[i].dbId + ",";
+                ids += selectData[i].id + ",";
             }
             ids = ids.substring(0, ids.length - 1);
 
             $.ajax({
                 type: "post",
-                url: "/dbSrc/deleteDbSrc",
+                url: "/dbSrc/deleteDbUrlSrc",
                 data: {
                     ids: ids
                 },
                 success: function (msg) {
                     alert(msg.message);
-                    refreshDefault('#dbSrcTb', searchParams);
+                    refreshDefault('#dbSrcUrlTb', searchParams);
                 },
                 error: function (msg) {
                     alert(msg.message);
@@ -183,6 +230,24 @@
             });
         }
 //        alert('111');
+    }
+
+    function saveChange(index) {
+        var row = $('#dbSrcUrlTb').bootstrapTable('getData')[index];
+        $.ajax({
+            type: "post",
+            url: "/dbSrc/updateDbUrlSrc",
+            data: {
+                entityString: JSON.stringify(row)
+            },
+            success: function (msg) {
+                alert(msg.message);
+                refreshDefault('#dbSrcUrlTb', searchParams);
+            },
+            error: function (msg) {
+                alert(msg.message);
+            }
+        });
     }
 
     function showMode(bodyContent, footerContent, titleContent) {
@@ -225,7 +290,11 @@
         <div class="form-group">
             <label for="driverName" class="col-sm-3 control-label">驱动类型</label>
             <div class="col-sm-6">
-                <input type="text" class="form-control" id="driverName" placeholder="请输入驱动类型">
+                <select id="driverName" class="form-control">
+                    <option value="com.mysql.jdbc.Driver">MySql</option>
+                    <option value="com.microsoft.sqlserver.jdbc.SQLServerDriver">SqlServer</option>
+                    <option value="oracle.jdbc.driver.OracleDriver">Oracle</option>
+                </select>
             </div>
         </div>
         <div class="form-group">
@@ -244,6 +313,15 @@
             <label for="password" class="col-sm-3 control-label">密码</label>
             <div class="col-sm-6">
                 <input type="text" class="form-control" id="password" placeholder="请输入密码">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="status" class="col-sm-3 control-label">启用状态</label>
+            <div class="col-sm-6">
+                <select id="status" class="form-control">
+                    <option value="1">启用</option>
+                    <option value="2">不启用</option>
+                </select>
             </div>
         </div>
     </form>

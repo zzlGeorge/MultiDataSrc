@@ -84,7 +84,7 @@
 
         //点击查询按钮后刷新
         function refresh() {
-            $("#sellOrderTable").bootstrapTable('refreshOptions', {
+            $("#safetyStockTb").bootstrapTable('refreshOptions', {
                 pageNumber: 1,
                 queryParams: searchParams
             });
@@ -162,7 +162,7 @@
 
             $("#hospitalName").html('<option value="' + hospitals[1]["id"] + '">' + hospitals[1]["text"] + '</option>');
 
-            $("#sellOrderTable").bootstrapTable({
+            $("#safetyStockTb").bootstrapTable({
                 url: '/hello/safetyStock',
                 method: 'post',
                 dataType: "json",
@@ -183,9 +183,9 @@
                     field: 'id',
                     title: '序号'
                 }, /*{
-                    field: 'storeroomPosition',
-                    title: '库位'
-                },*/ {
+                 field: 'storeroomPosition',
+                 title: '库位'
+                 },*/ {
                     field: 'materialsType',
                     title: '物料类型'
                 }, {
@@ -195,9 +195,9 @@
                     field: 'materialsName',
                     title: '物料名称'
                 }, /*{
-                    field: 'specifications',
-                    title: '规格'
-                }, */{
+                 field: 'specifications',
+                 title: '规格'
+                 }, */{
                     field: 'unit',
                     title: '单位'
                 }, {
@@ -312,7 +312,9 @@
                                 </div>
 
                                 <div class="col-xs-3">
-                                    <button class="btn btn-search" type="button" onclick="refreshDefault()">查询</button>
+                                    <button class="btn btn-search" type="button"
+                                            onclick="refreshDefault('#safetyStockTb',searchParams)">查询
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -324,7 +326,7 @@
                     <div class="ibox float-e-margins">
                         <div class="ibox-content no-border s1" style="padding-bottom: 82px;">
                             <div class="mt30" id="table-content">
-                                <table id="sellOrderTable">
+                                <table id="safetyStockTb">
                                 </table>
                             </div>
                         </div>

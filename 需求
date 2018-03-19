@@ -10,13 +10,18 @@
             1.增加：添加新的url信息
             2.修改、删除：修改url信息，删除也是逻辑删除
         ｝
+
+    ##数据库Mapper信息管理
+            添加mapper信息后需要重构数据源
+
     ##数据库启动与关闭控制
 
     ##数据源测试-库存物料查询
 
-    ##数据库Mapper信息管理
-        添加mapper信息后需要重构数据源
     ##数据库各信息查看
+
+
+
 
 
 【问题】
@@ -39,3 +44,10 @@
     }
     【将多数据源生成还是改成mybaits自带连接池】
 4.oracle数据库检测语句问题  【SELECT 1 FROM DUAL】
+
+5.bootstrap-table
+    $($id).bootstrapTable('refreshOptions', {
+                               pageNumber: 1,
+                               queryParams: params
+                           });
+    此句有问题。

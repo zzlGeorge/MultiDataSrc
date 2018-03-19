@@ -35,9 +35,12 @@ public class GeneratorTool {
      */
     @Test
     public void generateMapperTools() {
-        GeneratorMethods.generateMapper(mapperGenerator, Province.class,
-                "com.george.dao.mappers",
-                "\\src\\main\\resources\\mappers");
+        //配置
+//        Class<?> entityClass = TestAA.class;
+        String mapperInterfacePath = "com.supplier.dao";
+        String mapperXmlPath = "\\src\\main\\resources\\com\\supplier\\dao";
+
+//        GeneratorMethods.generateMapper(mapperGenerator, entityClass, mapperInterfacePath, mapperXmlPath);
         System.out.println("生成完毕。");
     }
 
@@ -46,21 +49,25 @@ public class GeneratorTool {
      */
     @Test
     public void generateJavaBeanFromDB() {
+        //配置信息
+        int id = 1;//
+        String basePath = Constants.ROOT_PATH + "/src/main/java";
+        String packagePath = "com.supplier.entity";
+        String tableName = "TestAA";
+        String beanClassName = "TestAA";
+
+        //获取connection
         Map<String, String> propkeys = new HashMap<String, String>();
         propkeys.put("username", "instrument.user");
         propkeys.put("password", "instrument.password");
         propkeys.put("driver", "instrument.driver");
         propkeys.put("url", "instrument.url");
         JdbcUtil jdbcUtil = new JdbcUtil("/props/instruments.properties", propkeys);
-//        Connection connection = SqlSessionHelper.getConnectionFromDataSource(3);//指定数据库连接
-         Connection connection = jdbcUtil.getConnection();
+        Connection connection = jdbcUtil.getConnection();
+
         try {
-//            String path = Constants.ROOT_PATH + "/src/main/java";
-//            String packages = "com.george.dao.entities";
-            String packages = "com.george.dao.entities.multi";
-            String path = Constants.ROOT_PATH + "/src/main/java";
-            boolean res = BeanProcess.generateJavaBeanFromDB(path, packages,
-                    connection, "base_area_code", "Area");//生成javabean文件于指定位置
+            BeanProcess.generateJavaBeanFromDB(basePath, packagePath,
+                    connection, tableName, beanClassName);//生成javabean文件于指定位置
             connection.close();
         } catch (SQLException e) {
             e.printStackTrace();

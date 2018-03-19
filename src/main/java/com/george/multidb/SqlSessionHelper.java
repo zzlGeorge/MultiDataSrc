@@ -130,4 +130,8 @@ public class SqlSessionHelper {
         return resSession;
     }
 
+    public static SqlSessionPools getSessionPoolsInstance() {
+        return sessionPools;
+    }
+
 }

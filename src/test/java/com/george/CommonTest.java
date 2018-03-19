@@ -1,6 +1,7 @@
 package com.george;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.george.dao.entities.DBSrcMappersEntity;
 import com.george.dao.entities.multi.Area;
 import com.george.dao.entities.multi.Province;
 import com.george.dao.mappers.DBDetailsMapper;
@@ -12,12 +13,18 @@ import com.george.multidb.SqlSessionHelper;
 import com.george.utils.jdbcUtils.JdbcDao;
 import com.george.utils.jdbcUtils.JdbcUtil;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
+import org.apache.ibatis.jdbc.SQL;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -128,5 +135,24 @@ public class CommonTest {
         String str = "π„÷› –";
         System.out.println(str.substring(0, 2));
         System.out.println(str);
+    }
+
+    @Test
+    public void testTx() {
+        SqlSessionHelper.getDataSource(1);
+        SqlSession sqlSession = SqlSessionHelper.getSessionPoolsInstance().getSessionFactories().get(1).openSession(false);
+        DBSrcMappersEntityMapper mapper = sqlSession.getMapper(DBSrcMappersEntityMapper.class);
+
+        try {
+            //service
+            DBSrcMappersEntity entity = new DBSrcMappersEntity();
+            entity.setId(4);
+            entity.setRemarks("new test");
+            mapper.update(entity);
+            int i = 1 / 0;
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
     }
 }

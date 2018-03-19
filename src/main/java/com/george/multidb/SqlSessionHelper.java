@@ -3,14 +3,11 @@ package com.george.multidb;
 import com.george.multidb.Impl.SqlSessionPools;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.session.SqlSessionManager;
 import org.apache.log4j.Logger;
-import org.mybatis.spring.SqlSessionTemplate;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.LinkedList;
 import java.util.Map;
 
 /**
@@ -21,7 +18,7 @@ public class SqlSessionHelper {
     private static SqlSessionPools sessionPools = new SqlSessionPools();
 
     /**
-     * »ñÈ¡idºÅÊı¾İÔ´SqlSession
+     * è·å–idå·æ•°æ®æºSqlSession
      */
     public static SqlSession getSqlSession(Integer id) {
         return sessionPools.getSession(id);
@@ -29,16 +26,16 @@ public class SqlSessionHelper {
 
 
     /**
-     * »ñÈ¡idºÅ³ØµÄÒ»¸öÁ¬½Ó
+     * è·å–idå·æ± çš„ä¸€ä¸ªè¿æ¥
      *
-     * @param id Êı¾İÔ´id
-     * @return ¸ÃÊı¾İÔ´ÏÂµÄÒ»¸öÁ¬½Ó
+     * @param id æ•°æ®æºid
+     * @return è¯¥æ•°æ®æºä¸‹çš„ä¸€ä¸ªè¿æ¥
      */
     public static Connection getPoolConn(Integer id) {
         if (id == null) return null;
         SqlSession targetSession = getSqlSession(id);
         try {
-            targetSession = checkSqlSession(targetSession, id);//¼ì²é
+            targetSession = checkSqlSession(targetSession, id);//æ£€æŸ¥
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -48,7 +45,7 @@ public class SqlSessionHelper {
     }
 
     /**
-     * ´ÓÊı¾İÔ´ÖĞ»ñÈ¡Ò»¸öÊı¾İ¿âÁ¬½Ó
+     * ä»æ•°æ®æºä¸­è·å–ä¸€ä¸ªæ•°æ®åº“è¿æ¥
      */
     public static Connection getConnectionFromDataSource(Integer id) {
         SqlSessionFactory factory = sessionPools.getSqlSessionFactory(id);
@@ -62,7 +59,7 @@ public class SqlSessionHelper {
     }
 
     /**
-     * »ñÈ¡idºÅÊı¾İÔ´
+     * è·å–idå·æ•°æ®æº
      */
     public static DataSource getDataSource(Integer id) {
         SqlSessionFactory factory = sessionPools.getSqlSessionFactory(id);
@@ -70,27 +67,45 @@ public class SqlSessionHelper {
     }
 
     /**
-     * Í¨¹ı£¨Ò½Ôº£©idºÍÒÑ´´½¨µÄMapper»ñÈ¡MapperÊµÀı
+     * é€šè¿‡idå’Œå·²åˆ›å»ºçš„Mapperè·å–Mapperå®ä¾‹
      *
-     * @param mapper     ÒÑ´´½¨µÄMapper½Ó¿Ú
-     * @param hospitalId Ò½Ôºid
+     * @param mapper å·²åˆ›å»ºçš„Mapperæ¥å£
+     * @param srcID  æ•°æ®æºid
      */
-    public static <T> T getMapperInstance(Class<T> mapper, Integer hospitalId) {
+    public static <T> T getMapperInstance(Class<T> mapper, Integer srcID) {
         SqlSession session = null;
         T instance = null;
         try {
-            session = getSqlSession(hospitalId);
-            session = checkSqlSession(session, hospitalId);
+            session = getSqlSession(srcID);
+            session = checkSqlSession(session, srcID);
             instance = session.getMapper(mapper);
         } catch (Exception e) {
             String mapperTotalName = mapper.getName();
-            String result = hospitalId + "ºÅÊı¾İÔ´Ã»ÓĞÅäÖÃ" + mapperTotalName.
-                    substring(mapperTotalName.lastIndexOf(".") + 1, mapperTotalName.length()) + ".xmlÎÄ¼ş";
+            String result = srcID + "å·æ•°æ®æºæ²¡æœ‰é…ç½®" + mapperTotalName.
+                    substring(mapperTotalName.lastIndexOf(".") + 1, mapperTotalName.length()) + ".xmlæ–‡ä»¶";
             System.out.println(result);
         } finally {
 //            sessionPools.closeSession(session);
         }
         return instance;
+    }
+
+
+    /**
+     * é€šè¿‡ç®¡ç†ç±»æ¥è§£å†³æ“ä½œæ•°æ®åº“çš„äº‹åŠ¡é—®é¢˜
+     *
+     * @param mapper mapperæ¥å£
+     * @param srcId  æ•°æ®æºid
+     * @param <T>    Mybatisçš„Mapperæ¥å£ç±»å‹
+     * @return ç”Ÿæˆmapperç®¡ç†å¯¹è±¡
+     */
+    public static <T> Object getTxMapperManager(Class<T> mapper, Integer srcId) {
+        if (!sessionPools.hasThePool(srcId))
+            sessionPools.createSessionPool(srcId);
+        SqlSession sqlSession = sessionPools.getSessionFactories()
+                .get(srcId).openSession(false);//è·å–æœ€åŸå§‹çš„mapper
+        Object mapperInstance = sqlSession.getMapper(mapper);
+        return new TXMapperManager(sqlSession, mapperInstance);
     }
 
     public static void createLocalPool() {
@@ -111,16 +126,16 @@ public class SqlSessionHelper {
 
 
     /**
-     * ¼ì²ésqlSession
+     * æ£€æŸ¥sqlSession
      *
-     * @param session    Ğè¼ì²éµÄSqlSession
-     * @param hospitalId Êı¾İÔ´id
+     * @param session    éœ€æ£€æŸ¥çš„SqlSession
+     * @param hospitalId æ•°æ®æºid
      */
     private static SqlSession checkSqlSession(SqlSession session, Integer hospitalId) throws Exception {
         SqlSession resSession = session;
-        /*if (!resSession.getConnection().isValid(5)) { //Èç¹ûSQLSessionÊ§Ğ§
-            log.info(hospitalId + "ºÅ³Ø" + "ÒÑ¾­Ê§Ğ§£¬Æô¶¯Ë¢ĞÂ£¡");
-            if (hospitalId == 0) {//±¾µØ³Ø´´½¨·½Ê½²»Ò»Ñù
+        /*if (!resSession.getConnection().isValid(5)) { //å¦‚æœSQLSessionå¤±æ•ˆ
+            log.info(hospitalId + "å·æ± " + "å·²ç»å¤±æ•ˆï¼Œå¯åŠ¨åˆ·æ–°ï¼");
+            if (hospitalId == 0) {//æœ¬åœ°æ± åˆ›å»ºæ–¹å¼ä¸ä¸€æ ·
                 createLocalPool();
             } else {
                 sessionPools.createSessionPool(hospitalId);
@@ -130,8 +145,8 @@ public class SqlSessionHelper {
         return resSession;
     }
 
-    public static SqlSessionPools getSessionPoolsInstance() {
-        return sessionPools;
-    }
+//    public static SqlSessionPools getSessionPoolsInstance() {
+//        return sessionPools;
+//    }
 
 }

@@ -191,9 +191,10 @@
         <include refid="com.george.utils.generators.mybatis.mapper.CRUDMapper.orderBy"/>
     </select>
 
-    <insert id="saveDbUrlSrc" parameterType="com.george.dao.entities.DBDetailsEntity">
-        INSERT INTO db_details(url , serverName, userName , driverName , updateTime , password, `status`) VALUE
-        (#{entity.url},#{entity.serverName}, #{entity.userName} , #{entity.driverName} , #{entity.updateTime} ,
+    <insert id="saveDbUrlSrc" parameterType="com.george.dao.entities.DBDetailsEntity"
+            useGeneratedKeys="true" keyProperty="entity.id">
+        INSERT INTO db_details(url , userName , driverName , updateTime , password, `status`) VALUE
+        (#{entity.url}, #{entity.userName} , #{entity.driverName} , #{entity.updateTime} ,
         #{entity.password},#{entity.status})
     </insert>
 

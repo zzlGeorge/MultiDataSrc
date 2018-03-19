@@ -1,7 +1,6 @@
 package com.george.generator;
 
 import com.george.dao.entities.DBSrcMappersEntity;
-import com.george.dao.entities.multi.Province;
 import com.george.general.Constants;
 import com.george.multidb.SqlSessionHelper;
 import com.george.utils.generators.mybatis.generator.MapperGenerator;

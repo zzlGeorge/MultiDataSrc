@@ -27,9 +27,9 @@
     </filter-mapping>
 
     <!-- 监听器 -->
-    <listener>
+    <!--<listener>
         <listener-class>com.george.web.servlet.MultiDatabaseInitListener</listener-class>
-    </listener>
+    </listener>-->
 
 
     <!-- 注入框架配置 -->

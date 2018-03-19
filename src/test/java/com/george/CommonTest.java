@@ -2,34 +2,16 @@ package com.george;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.george.dao.entities.DBSrcMappersEntity;
-import com.george.dao.entities.multi.Area;
-import com.george.dao.entities.multi.Province;
-import com.george.dao.mappers.DBDetailsMapper;
 import com.george.dao.mappers.DBSrcMappersEntityMapper;
-import com.george.dao.mappers.ProvinceMapper;
 import com.george.general.Constants;
-import com.george.multidb.Impl.SqlSessionPools;
+import com.george.multidb.TXMapperManager;
 import com.george.multidb.SqlSessionHelper;
 import com.george.utils.jdbcUtils.JdbcDao;
 import com.george.utils.jdbcUtils.JdbcUtil;
-import org.apache.ibatis.datasource.pooled.PooledDataSource;
-import org.apache.ibatis.jdbc.SQL;
-import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-import javax.sql.DataSource;
 import java.sql.*;
 import java.util.*;
-import java.util.Date;
 
 /**
  * Created by George on 2017/12/12.
@@ -64,10 +46,10 @@ public class CommonTest {
 
         /*try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
-            String url = "jdbc:oracle:thin:@192.168.20.11:1521:orcl";    //»ñÈ¡Á¬½ÓURL
-            String user = "ecology"; //Á¬½ÓÓÃ»§Ãû
-            String password = "Medicalsystem0815"; //Á¬½ÓÃÜÂë
-            Connection con = DriverManager.getConnection(url, user, password); //»ñÈ¡Êı¾İ¿âÁ¬½Ó
+            String url = "jdbc:oracle:thin:@192.168.20.11:1521:orcl";    //è·å–è¿æ¥URL
+            String user = "ecology"; //è¿æ¥ç”¨æˆ·å
+            String password = "Medicalsystem0815"; //è¿æ¥å¯†ç 
+            Connection con = DriverManager.getConnection(url, user, password); //è·å–æ•°æ®åº“è¿æ¥
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (SQLException e1) {
@@ -83,23 +65,23 @@ public class CommonTest {
     }
 
     /**
-     * DruidÁ¬½Ó³Ø²âÊÔ
+     * Druidè¿æ¥æ± æµ‹è¯•
      */
     @Test
     public void testDruidPools() {
-        //´´½¨ÁËÒ»¸öÊµÀı
+        //åˆ›å»ºäº†ä¸€ä¸ªå®ä¾‹
         DruidDataSource dataSource = new DruidDataSource();
-        //ÉèÖÃÊı¾İ¿âÁ¬½ÓµØÖ·
+        //è®¾ç½®æ•°æ®åº“è¿æ¥åœ°å€
         dataSource.setUrl("jdbc:sqlserver://192.168.20.164:1433;databaseName=MedicalSIMS001");
         dataSource.setUsername("sa");
         dataSource.setPassword("MK2017!");
-        //ÉèÖÃ³õÊ¼»¯´óĞ¡
+        //è®¾ç½®åˆå§‹åŒ–å¤§å°
         dataSource.setInitialSize(1);
-        //ÉèÖÃÔÚÊı¾İ¿âÁ¬½Ó´ÊÖĞµÄ×îĞ¡Á¬½ÓÊı
+        //è®¾ç½®åœ¨æ•°æ®åº“è¿æ¥è¯ä¸­çš„æœ€å°è¿æ¥æ•°
         dataSource.setMinIdle(1);
-        //ÉèÖÃ×î´óÁ¬½ÓÊı
+        //è®¾ç½®æœ€å¤§è¿æ¥æ•°
         dataSource.setMaxActive(20);
-        //ÉèÖÃ»ñÈ¡Á¬½ÓµÄ×î´óµÈ´ıÊ±¼ä
+        //è®¾ç½®è·å–è¿æ¥çš„æœ€å¤§ç­‰å¾…æ—¶é—´
         dataSource.setMaxWait(60000);
 
         dataSource.setTimeBetweenEvictionRunsMillis(60000);
@@ -132,27 +114,41 @@ public class CommonTest {
 
     @Test
     public void testCommon2() {
-        String str = "¹ãÖİÊĞ";
-        System.out.println(str.substring(0, 2));
-        System.out.println(str);
+        TXMapperManager manager = (TXMapperManager) SqlSessionHelper
+                .getTxMapperManager(DBSrcMappersEntityMapper.class, 1);
+        DBSrcMappersEntityMapper mapper = (DBSrcMappersEntityMapper) manager.getMapperInstance();
+
+        DBSrcMappersEntity entity = new DBSrcMappersEntity();
+        entity.setId(4);
+        entity.setRemarks("4444");
+        mapper.update(entity);
+
+        entity.setId(3);
+        entity.setRemarks("33333");
+        mapper.update(entity);
+
+//        int i = 1 / 0;
+        manager.finishedAndCommit();//æäº¤äº‹åŠ¡
     }
+
 
     @Test
     public void testTx() {
-        SqlSessionHelper.getDataSource(1);
-        SqlSession sqlSession = SqlSessionHelper.getSessionPoolsInstance().getSessionFactories().get(1).openSession(false);
-        DBSrcMappersEntityMapper mapper = sqlSession.getMapper(DBSrcMappersEntityMapper.class);
-
-        try {
-            //service
-            DBSrcMappersEntity entity = new DBSrcMappersEntity();
-            entity.setId(4);
-            entity.setRemarks("new test");
-            mapper.update(entity);
-            int i = 1 / 0;
-            sqlSession.commit();
-        } finally {
-            sqlSession.close();
-        }
+//        SqlSessionHelper.getDataSource(1);
+//        SqlSession sqlSession = SqlSessionHelper.getSessionPoolsInstance().getSessionFactories().get(1).openSession(false);
+//        DBSrcMappersEntityMapper mapper = sqlSession.getMapper(DBSrcMappersEntityMapper.class);
+//
+//        try {
+//            //service
+//            DBSrcMappersEntity entity = new DBSrcMappersEntity();
+//            entity.setId(4);
+//            entity.setRemarks("new test");
+//            mapper.update(entity);
+//            int i = 1 / 0;
+//            sqlSession.commit();
+//        } finally {
+//            sqlSession.close();
+//        }
     }
+
 }

@@ -25,7 +25,7 @@ public class DBSrcMapperController {
     private DatabaseSrcMapperService databaseSrcMapperService;
 
     /**
-     * 数据源Mapper信息页面
+     * 鏁版嵁婧怣apper淇℃伅椤甸潰
      */
     @RequestMapping(value = "/dbMappersView", method = RequestMethod.GET)
     public String dbMappersViewPage() {
@@ -33,15 +33,9 @@ public class DBSrcMapperController {
     }
 
     /**
-     * 数据源mappers仓库信息查询
+     * 鏁版嵁婧恗appers浠撳簱淇℃伅鏌ヨ
      */
-    @RequestMapping(value = "/getSrcMappers", method = RequestMethod.GET)
-    @ResponseBody
-    public Object getSrcMappersGET(ParamObject param, DBSrcMappersEntity entity) {
-        return getSrcMappers(param, entity);
-    }
-
-    @RequestMapping(value = "/getSrcMappers", method = RequestMethod.POST)
+    @RequestMapping(value = "/getSrcMappers", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     public Object getSrcMappers(ParamObject param, DBSrcMappersEntity entity) {
         List<DBSrcMappersEntity> data = databaseSrcMapperService.getSrcMappersInfo(entity);

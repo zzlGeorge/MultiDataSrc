@@ -67,15 +67,9 @@ public class HelloController {
     }
 
     /**
-     * ÎïÁÏ¿â´æ¡ª¡ª²âÊÔ
+     * ç‰©æ–™åº“å­˜â€”â€”æµ‹è¯•
      */
-    @RequestMapping(value = "/safetyStock", method = RequestMethod.GET)
-    @ResponseBody
-    public Object safetyStockGet(SafetyStockParam pageInfo) {
-        return safetyStock(pageInfo);
-    }
-
-    @RequestMapping(value = "/safetyStock", method = RequestMethod.POST)
+    @RequestMapping(value = "/safetyStock", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     public Object safetyStock(SafetyStockParam pageInfo) {
         if (pageInfo.getHospitalId() == null)
@@ -85,12 +79,12 @@ public class HelloController {
             List<Object> data = mapper.getSafetyStockDataByEntity(pageInfo);
             pageInfo = (SafetyStockParam) FilterData.splitPage(pageInfo, data);
         } catch (Exception e) {
-            String result = pageInfo.getHospitalId() + "ºÅÊı¾İÔ´Ã»ÓĞÅäÖÃSafetyStockMapper.xmlÎÄ¼ş";
+            String result = pageInfo.getHospitalId() + "å·æ•°æ®æºæ²¡æœ‰é…ç½®SafetyStockMapper.xmlæ–‡ä»¶";
             pageInfo.setMessage(result);
             pageInfo.setCode(-1);
         }
 
-        //²âÊÔÊı¾İ-------------------------------------------------------start
+        //æµ‹è¯•æ•°æ®-------------------------------------------------------start
 //        List<Object> testdata = pageInfo.getDataList();
 //        Random r = new Random();
 //        for (Object o : testdata) {
@@ -103,7 +97,7 @@ public class HelloController {
 //            }
 //        }
 //        pageInfo.setDataList(testdata);
-        //²âÊÔÊı¾İ-------------------------------------------------------end
+        //æµ‹è¯•æ•°æ®-------------------------------------------------------end
         return pageInfo;
     }
 

@@ -27,7 +27,7 @@ public class DBSrcController {
     private DatabaseSrcService databaseSrcService;
 
     /**
-     * Êı¾İÔ´»ù±¾ĞÅÏ¢Ò³Ãæ
+     * æ•°æ®æºåŸºæœ¬ä¿¡æ¯é¡µé¢
      */
     @RequestMapping(value = "/dbSrcView", method = RequestMethod.GET)
     public String dbSrcViewPage() {
@@ -35,15 +35,9 @@ public class DBSrcController {
     }
 
     /**
-     * Êı¾İÔ´Ãû³Æ»ñÈ¡
+     * æ•°æ®æºåç§°è·å–
      */
-    @RequestMapping(value = "/baseSrcInfo", method = RequestMethod.GET)
-    @ResponseBody
-    public Object baseSrcInfoGET(ParamObject param, DBSrcInfoEntity entity) {
-        return baseSrcInfo(param, entity);
-    }
-
-    @RequestMapping(value = "/baseSrcInfo", method = RequestMethod.POST)
+    @RequestMapping(value = "/baseSrcInfo", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     public Object baseSrcInfo(ParamObject param, DBSrcInfoEntity entity) {
         List<DBSrcInfoEntity> data = databaseSrcService.getSrcInfo(entity);
@@ -52,7 +46,7 @@ public class DBSrcController {
     }
 
     /**
-     * Êı¾İÔ´»ù±¾ĞÅÏ¢
+     * æ•°æ®æºåŸºæœ¬ä¿¡æ¯
      */
     @RequestMapping(value = "/srcInfoView", method = RequestMethod.POST)
     @ResponseBody
@@ -61,18 +55,13 @@ public class DBSrcController {
         return FilterData.splitPage(param, data);
     }
 
-    @RequestMapping(value = "/getMapperDbUser", method = RequestMethod.GET)
-    @ResponseBody
-    public Object getMapperDbUserGET(ParamObject param, Integer mapperId) {
-        return getMapperDbUser(param, mapperId);
-    }
 
-    @RequestMapping(value = "/getMapperDbUser", method = RequestMethod.POST)
+    @RequestMapping(value = "/getMapperDbUser", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     public Object getMapperDbUser(ParamObject param, Integer mapperId) {
         if (mapperId == null) {
             param.setResult(false);
-            param.setMessage("mapperIdÎ´Ö¸¶¨");
+            param.setMessage("mapperIdæœªæŒ‡å®š");
             param.setCode(-1);
             return param;
         }
@@ -87,9 +76,9 @@ public class DBSrcController {
         boolean result = databaseSrcService.saveDbSrc(entity);
         if (!result) {
             param.setResult(false);
-            param.setMessage("Ìí¼ÓÊı¾İ¿âÊ§°Ü£¡");
+            param.setMessage("æ·»åŠ æ•°æ®åº“å¤±è´¥ï¼");
         } else {
-            param.setMessage("Ìí¼ÓÊı¾İ¿â³É¹¦£¡");
+            param.setMessage("æ·»åŠ æ•°æ®åº“æˆåŠŸï¼");
         }
         return param;
     }
@@ -100,9 +89,9 @@ public class DBSrcController {
         boolean result = databaseSrcService.deleteDbSrc(ids);
         if (!result) {
             param.setResult(false);
-            param.setMessage("É¾³ıÊı¾İ¿âÊ§°Ü£¡");
+            param.setMessage("åˆ é™¤æ•°æ®åº“å¤±è´¥ï¼");
         } else {
-            param.setMessage("É¾³ıÊı¾İ¿â³É¹¦£¡");
+            param.setMessage("åˆ é™¤æ•°æ®åº“æˆåŠŸï¼");
         }
         return param;
     }
@@ -115,9 +104,9 @@ public class DBSrcController {
         boolean result = databaseSrcService.updateDbSrc(entity);
         if (!result) {
             param.setResult(false);
-            param.setMessage("¸üĞÂ¸ÃÊı¾İ¿âÊ§°Ü£¡");
+            param.setMessage("æ›´æ–°è¯¥æ•°æ®åº“å¤±è´¥ï¼");
         } else {
-            param.setMessage("¸üĞÂ¸ÃÊı¾İ¿â³É¹¦£¡");
+            param.setMessage("æ›´æ–°è¯¥æ•°æ®åº“æˆåŠŸï¼");
         }
         return param;
     }

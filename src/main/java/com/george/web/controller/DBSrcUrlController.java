@@ -27,7 +27,7 @@ public class DBSrcUrlController {
     private DatabaseSrcUrlService databaseSrcUrlService;
 
     /**
-     * Êı¾İÔ´Á¬½ÓĞÅÏ¢Ò³Ãæ
+     * æ•°æ®æºè¿æ¥ä¿¡æ¯é¡µé¢
      */
     @RequestMapping(value = "/dbSrcUrlView", method = RequestMethod.GET)
     public String dbSrcUrlViewPage() {
@@ -36,15 +36,9 @@ public class DBSrcUrlController {
 
 
     /**
-     * Êı¾İÔ´½ÏÍêÕûĞÅÏ¢£¨°üº¬Á¬½ÓĞÅÏ¢£©
+     * æ•°æ®æºè¾ƒå®Œæ•´ä¿¡æ¯ï¼ˆåŒ…å«è¿æ¥ä¿¡æ¯ï¼‰
      */
-    @RequestMapping(value = "/getSrcInfo", method = RequestMethod.GET)
-    @ResponseBody
-    public Object getSrcInfoGET(ParamObject param, DBDetailsEntity entity) {
-        return getSrcInfo(param, entity);
-    }
-
-    @RequestMapping(value = "/getSrcInfo", method = RequestMethod.POST)
+    @RequestMapping(value = "/getSrcInfo", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     public Object getSrcInfo(ParamObject param, DBDetailsEntity entity) {
         List<DBDetailsEntity> data = databaseSrcUrlService.getSrcDetailsInfo(entity);
@@ -53,15 +47,9 @@ public class DBSrcUrlController {
     }
 
     /**
-     * Êı¾İÔ´½ÏÍêÕûĞÅÏ¢£¨°üº¬Á¬½ÓĞÅÏ¢£©
+     * æ•°æ®æºè¾ƒå®Œæ•´ä¿¡æ¯ï¼ˆåŒ…å«è¿æ¥ä¿¡æ¯ï¼‰
      */
-    @RequestMapping(value = "/getSrcUrlInfo", method = RequestMethod.GET)
-    @ResponseBody
-    public Object getSrcUrlInfoGET(ParamObject param, DBDetailsEntity entity) {
-        return getSrcUrlInfo(param, entity);
-    }
-
-    @RequestMapping(value = "/getSrcUrlInfo", method = RequestMethod.POST)
+    @RequestMapping(value = "/getSrcUrlInfo", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     public Object getSrcUrlInfo(ParamObject param, DBDetailsEntity entity) {
         List<DBDetailsEntity> data = databaseSrcUrlService.getSrcUrlInfo(entity);
@@ -69,7 +57,7 @@ public class DBSrcUrlController {
     }
 
     /**
-     * »ñÈ¡ËùÓĞÊı¾İ¿â·şÎñÁ´½ÓµÄĞÅÏ¢
+     * è·å–æ‰€æœ‰æ•°æ®åº“æœåŠ¡é“¾æ¥çš„ä¿¡æ¯
      */
     @RequestMapping(value = "/getAllSrcUrlInfo", method = RequestMethod.POST)
     @ResponseBody
@@ -80,15 +68,9 @@ public class DBSrcUrlController {
     }
 
     /**
-     * »ñÈ¡Ä³¸öÊı¾İ¿âµÄÁ¬½ÓĞÅÏ¢
+     * è·å–æŸä¸ªæ•°æ®åº“çš„è¿æ¥ä¿¡æ¯
      */
-    @RequestMapping(value = "/getOneUrlInfo", method = RequestMethod.GET)
-    @ResponseBody
-    public Object getSrcUrlInfoGET(DBDetailsEntity entity) {
-        return getSrcUrlInfo(entity);
-    }
-
-    @RequestMapping(value = "/getOneUrlInfo", method = RequestMethod.POST)
+    @RequestMapping(value = "/getOneUrlInfo", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     public Object getSrcUrlInfo(DBDetailsEntity entity) {
         List<DBDetailsEntity> data = databaseSrcUrlService.getSrcUrlInfo(entity);
@@ -103,9 +85,9 @@ public class DBSrcUrlController {
         boolean result = databaseSrcUrlService.saveDbUrlSrc(entity);
         if (!result) {
             param.setResult(false);
-            param.setMessage("Ìí¼ÓÊı¾İ¿â·şÎñĞÅÏ¢Ê§°Ü£¡");
+            param.setMessage("æ·»åŠ æ•°æ®åº“æœåŠ¡ä¿¡æ¯å¤±è´¥ï¼");
         } else {
-            param.setMessage("Ìí¼ÓÊı¾İ¿â·şÎñĞÅÏ¢³É¹¦£¡");
+            param.setMessage("æ·»åŠ æ•°æ®åº“æœåŠ¡ä¿¡æ¯æˆåŠŸï¼");
         }
         return param;
     }
@@ -116,9 +98,9 @@ public class DBSrcUrlController {
         boolean result = databaseSrcUrlService.deleteDbUrlSrc(ids);
         if (!result) {
             param.setResult(false);
-            param.setMessage("É¾³ıÊı¾İ¿â·şÎñÊ§°Ü£¡");
+            param.setMessage("åˆ é™¤æ•°æ®åº“æœåŠ¡å¤±è´¥ï¼");
         } else {
-            param.setMessage("É¾³ıÊı¾İ¿â·şÎñ³É¹¦£¡");
+            param.setMessage("åˆ é™¤æ•°æ®åº“æœåŠ¡æˆåŠŸï¼");
         }
         return param;
     }
@@ -131,9 +113,9 @@ public class DBSrcUrlController {
         boolean result = databaseSrcUrlService.updateDbUrlSrc(entity);
         if (!result) {
             param.setResult(false);
-            param.setMessage("¸üĞÂ¸ÃÊı¾İ¿â·şÎñÊ§°Ü£¡");
+            param.setMessage("æ›´æ–°è¯¥æ•°æ®åº“æœåŠ¡å¤±è´¥ï¼");
         } else {
-            param.setMessage("¸üĞÂ¸ÃÊı¾İ¿â·şÎñ³É¹¦£¡");
+            param.setMessage("æ›´æ–°è¯¥æ•°æ®åº“æœåŠ¡æˆåŠŸï¼");
         }
         return param;
     }

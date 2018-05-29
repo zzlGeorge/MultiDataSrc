@@ -11,10 +11,10 @@ public final class Constants {
     public static final String PACKAGE_NAME = "com.george";
 
     static {
-        StringBuilder test = new StringBuilder(Constants.class.getClassLoader().getResource(".").getPath());
+        StringBuilder rootPath = new StringBuilder(Constants.class.getClassLoader().getResource(".").getPath());
         String s = "";
         try {
-            s = URLDecoder.decode(test.substring(1, test.indexOf("/target")), "utf-8");
+            s = URLDecoder.decode(rootPath.substring(1, rootPath.indexOf("/target")), "utf-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

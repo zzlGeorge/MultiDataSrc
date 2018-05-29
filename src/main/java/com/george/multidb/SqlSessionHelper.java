@@ -84,8 +84,6 @@ public class SqlSessionHelper {
             String result = srcID + "号数据源没有配置" + mapperTotalName.
                     substring(mapperTotalName.lastIndexOf(".") + 1, mapperTotalName.length()) + ".xml文件";
             System.out.println(result);
-        } finally {
-//            sessionPools.closeSession(session);
         }
         return instance;
     }

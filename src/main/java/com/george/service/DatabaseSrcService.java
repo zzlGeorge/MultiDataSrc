@@ -14,19 +14,19 @@ public interface DatabaseSrcService {
     List<DBSrcInfoEntity> getSrcInfo(DBSrcInfoEntity entity);
 
     /**
-     * ÕÒµ½Ö¸¶¨mapperµÄÊı¾İÔ´Ê¹ÓÃÕß
+     * æ‰¾åˆ°æŒ‡å®šmapperçš„æ•°æ®æºä½¿ç”¨è€…
      * */
     List<DBSrcInfoEntity> getMapperDbUser(Integer mapperId);
 
     /**
-     * ±£´æÊı¾İ¿âÏà¹ØĞÅÏ¢
+     * ä¿å­˜æ•°æ®åº“ç›¸å…³ä¿¡æ¯
      * */
     boolean saveDbSrc(DBSrcInfoEntity entity);
 
     boolean deleteDbSrc(Integer[] ids);
 
     /**
-     * ¸üĞÂÊı¾İ¿â»ù±¾ĞÅÏ¢
+     * æ›´æ–°æ•°æ®åº“åŸºæœ¬ä¿¡æ¯
      * */
     boolean updateDbSrc(DBSrcInfoEntity entity);
 

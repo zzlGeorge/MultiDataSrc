@@ -1,5 +1,6 @@
 package com.george.generator;
 
+import com.george.dao.entities.AreaInfo;
 import com.george.dao.entities.DBSrcMappersEntity;
 import com.george.general.Constants;
 import com.george.multidb.SqlSessionHelper;
@@ -35,11 +36,11 @@ public class GeneratorTool {
     @Test
     public void generateMapperTools() {
         //配置
-//        Class<?> entityClass = TestAA.class;
-        String mapperInterfacePath = "com.supplier.dao";
-        String mapperXmlPath = "\\src\\main\\resources\\com\\supplier\\dao";
+        Class<?> entityClass = AreaInfo.class;
+        String mapperInterfacePath = "com.george.dao.mappers";
+        String mapperXmlPath = "\\src\\main\\resources\\mappers";
 
-//        GeneratorMethods.generateMapper(mapperGenerator, entityClass, mapperInterfacePath, mapperXmlPath);
+        GeneratorMethods.generateMapper(mapperGenerator, entityClass, mapperInterfacePath, mapperXmlPath);
         System.out.println("生成完毕。");
     }
 
@@ -51,17 +52,18 @@ public class GeneratorTool {
         //配置信息
         int id = 1;//
         String basePath = Constants.ROOT_PATH + "/src/main/java";
-        String packagePath = "com.supplier.entity";
-        String tableName = "TestAA";
-        String beanClassName = "TestAA";
+        String packagePath = "com.george.dao.entities";
+        String tableName = "rc_district";
+        String beanClassName = "AreaInfo";
 
         //获取connection
-        Map<String, String> propkeys = new HashMap<String, String>();
-        propkeys.put("username", "instrument.user");
-        propkeys.put("password", "instrument.password");
-        propkeys.put("driver", "instrument.driver");
-        propkeys.put("url", "instrument.url");
-        JdbcUtil jdbcUtil = new JdbcUtil("/props/instruments.properties", propkeys);
+//        Map<String, String> propkeys = new HashMap<String, String>();
+//        propkeys.put("username", "instrument.user");
+//        propkeys.put("password", "instrument.password");
+//        propkeys.put("driver", "instrument.driver");
+//        propkeys.put("url", "instrument.url");
+//        JdbcUtil jdbcUtil = new JdbcUtil("/props/instruments.properties", propkeys);
+        JdbcUtil jdbcUtil = new JdbcUtil();
         Connection connection = jdbcUtil.getConnection();
 
         try {

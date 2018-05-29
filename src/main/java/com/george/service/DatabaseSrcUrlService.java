@@ -13,17 +13,17 @@ public interface DatabaseSrcUrlService {
     List<DBDetailsEntity> getSrcUrlInfo(DBDetailsEntity entity);
 
     /**
-     * ±£´æÊı¾İ¿â·şÎñĞÅÏ¢
+     * ä¿å­˜æ•°æ®åº“æœåŠ¡ä¿¡æ¯
      * */
     boolean saveDbUrlSrc(DBDetailsEntity entity);
 
     /**
-     * É¾³ıÊı¾İ¿â·şÎñ
+     * åˆ é™¤æ•°æ®åº“æœåŠ¡
      * */
     boolean deleteDbUrlSrc(Integer[] ids);
 
     /**
-     * ¸üĞÂÊı¾İ¿â·şÎñ»ù±¾ĞÅÏ¢
+     * æ›´æ–°æ•°æ®åº“æœåŠ¡åŸºæœ¬ä¿¡æ¯
      * */
     boolean updateDbUrlSrc(DBDetailsEntity entity);
 }

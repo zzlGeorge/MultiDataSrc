@@ -29,7 +29,7 @@ public class DatabaseSrcUrlServiceImpl implements DatabaseSrcUrlService{
 
     public boolean saveDbUrlSrc(DBDetailsEntity entity) {
         entity.setUpdateTime(new Date());
-        return dbDetailsMapper.saveDbUrlSrc(entity) > 0 ? true : false;
+        return dbDetailsMapper.saveDbUrlSrc(entity) > 0;
     }
 
     public boolean deleteDbUrlSrc(Integer[] ids) {
@@ -41,12 +41,12 @@ public class DatabaseSrcUrlServiceImpl implements DatabaseSrcUrlService{
             entity.setDeleteFlag(1);
             list.add(entity);
         }
-        return dbDetailsMapper.updateBatchDbUrl(list) > 0 ? true : false;
+        return dbDetailsMapper.updateBatchDbUrl(list) > 0;
     }
 
     public boolean updateDbUrlSrc(DBDetailsEntity entity) {
         List<DBDetailsEntity> list = new LinkedList<DBDetailsEntity>();
         list.add(entity);
-        return dbDetailsMapper.updateBatchDbUrl(list) > 0 ? true : false;
+        return dbDetailsMapper.updateBatchDbUrl(list) > 0;
     }
 }

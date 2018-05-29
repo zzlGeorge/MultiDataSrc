@@ -35,7 +35,10 @@ public class JdbcUtil {
                 String columnClassName = ColumnTypeEnum.getColumnTypeEnumByDBType(columnModel.getTypeName());
 //                String fieldName = getFieldName(columnModel.getColumnName());
                 String fieldName = columnModel.getColumnName();
+
+                //TODO 此处可能遇到类型转换找不到的问题
                 String fieldType = Class.forName(columnClassName).getSimpleName();
+
                 columnModel.setFieldName(fieldName);
                 columnModel.setColumnClassName(columnClassName);
                 columnModel.setFieldType(fieldType);

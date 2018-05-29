@@ -27,7 +27,8 @@ public enum ColumnTypeEnum {
     CHAR("char", "java.lang.String"),
     INT("int", "java.lang.Integer"),
     BIGINT("bigint", "java.math.BigInteger"),//    --
-    BIGINT_UNSIGNED("bigint unsigned","java.lang.String"),
+    BIGINT_UNSIGNED("bigint unsigned","java.lang.Integer"),
+    SMALLINT_UNSIGNED("smallint unsigned","java.lang.Integer"),
 
     //sql server
     DATETIME("datetime", "java.util.Date"),

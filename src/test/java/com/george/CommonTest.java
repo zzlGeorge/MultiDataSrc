@@ -1,13 +1,16 @@
 package com.george;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.george.dao.entities.AreaInfo;
 import com.george.dao.entities.DBSrcMappersEntity;
+import com.george.dao.mappers.AreaInfoMapper;
 import com.george.dao.mappers.DBSrcMappersEntityMapper;
 import com.george.general.Constants;
 import com.george.multidb.TXMapperManager;
 import com.george.multidb.SqlSessionHelper;
 import com.george.utils.jdbcUtils.JdbcDao;
 import com.george.utils.jdbcUtils.JdbcUtil;
+import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 
 import java.sql.*;
@@ -59,9 +62,59 @@ public class CommonTest {
 
     @Test
     public void testGetMapper() {
-        DBSrcMappersEntityMapper mapper = SqlSessionHelper.getMapperInstance(DBSrcMappersEntityMapper.class, 1);
-        mapper.getSrcMappers(null);
-        System.out.println();
+        long t1 = System.currentTimeMillis();
+
+        AreaInfoMapper mapper = SqlSessionHelper.getMapperInstance(AreaInfoMapper.class, 6);
+        List<AreaInfo> areaInfos = mapper.findByEntity(null, null);
+
+        List<AreaInfo> tree = new ArrayList<AreaInfo>();
+
+        for (AreaInfo child : areaInfos) {
+            Integer pId = child.getPid();
+            if (pId == null || pId == 0) {
+                tree.add(child);
+            } else {
+                for (AreaInfo parent : areaInfos) {
+                    Integer id = parent.getId();
+                    if (pId.equals(id)) {
+                        parent.getNodes().add(child);
+                    }
+                }
+            }
+        }
+
+        areaInfos.get(1).getNodes().get(0).setDistrict("被改了！！！！");
+
+        System.out.println("消耗时间：" + (System.currentTimeMillis() - t1));
+    }
+
+    @Test
+    public void testGetMapper1() {
+        long t1 = System.currentTimeMillis();
+        AreaInfoMapper mapper = SqlSessionHelper.getMapperInstance(AreaInfoMapper.class, 6);
+        List<AreaInfo> areaInfos = mapper.findByEntity(null, null);
+
+        Map<Integer, AreaInfo> tempMap = new HashMap<Integer, AreaInfo>();//hashmap 提升查找效率
+        for (AreaInfo node : areaInfos) {
+            tempMap.put(node.getId(), node);
+        }
+
+        List<AreaInfo> tree = new ArrayList<AreaInfo>();
+        for (AreaInfo child : areaInfos) {
+            Integer pId = child.getPid();
+            if (pId == null || pId == 0) {//父节点
+                tree.add(child);
+            } else {//找父节点
+                AreaInfo parent = tempMap.get(pId);//利用hashmap查找child的父节点
+                if (parent != null) {
+                    parent.getNodes().add(child);//将孩子节点加入父节点中
+                }
+            }
+        }
+
+        tempMap.get(2).setDistrict("被改了！");
+
+        System.out.println("消耗时间：" + (System.currentTimeMillis() - t1));
     }
 
     /**

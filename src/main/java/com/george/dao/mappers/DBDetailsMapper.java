@@ -26,12 +26,12 @@ public interface DBDetailsMapper extends CRUDMapper<DBDetailsEntity, Long> {
     int updateDbSrc(@Param("entity") DBSrcInfoEntity entity);
 
     /**
-     * ÅúÁ¿¸üĞÂĞÅÏ¢
+     * æ‰¹é‡æ›´æ–°ä¿¡æ¯
      */
     int updateBatch(@Param("list") List<DBSrcInfoEntity> list);
 
     /**
-     * ÅúÁ¿¸üĞÂÊı¾İ¿â·şÎñĞÅÏ¢
+     * æ‰¹é‡æ›´æ–°æ•°æ®åº“æœåŠ¡ä¿¡æ¯
      * */
     int updateBatchDbUrl(@Param("list") List<DBDetailsEntity> list);
 }

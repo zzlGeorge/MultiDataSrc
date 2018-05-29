@@ -71,7 +71,6 @@
         <include refid="baseColumns"/>
         FROM db_details
         <where>
-            deleteFlag = 0
             <if test="entity.id != null">
                 AND id = #{entity.id}
             </if>
